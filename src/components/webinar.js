@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Switch, Route, useHistory, useParams, useRouteMatch } from "react-router-dom";
 import axios from "axios";
+import XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 import Mainform from "./mainform";
 
@@ -104,8 +106,59 @@ function Webinar(props) {
            <h5 class="card-header">
             Webinar Details
             <button
+             className="btn"
+             style={{ color: "green" }}
+             onClick={() => {
+              const apiResources = val.users.map((user, j) => {
+               return { number: user.number };
+              });
+
+              async function getAllUrls(urls) {
+               try {
+                var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/find", url).then((res) => res.data)));
+                const excelArray = datas
+                 .filter((data) => data)
+                 .map((data, i) => {
+                  return [data.name, data.number, data.school];
+                 });
+
+                var wb = XLSX.utils.book_new();
+                wb.Props = {
+                 Title: "Registered Students",
+                 Subject: "Registered Students",
+                 Author: "Arjuna",
+                 CreatedDate: new Date(),
+                };
+
+                wb.SheetNames.push("Registered Students");
+
+                var ws = XLSX.utils.aoa_to_sheet([["Name", "WhatsApp No", "School"], ...excelArray]);
+                wb.Sheets["Registered Students"] = ws;
+                var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+                function s2ab(s) {
+                 var buf = new ArrayBuffer(s.length);
+                 var view = new Uint8Array(buf);
+                 for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+                 return buf;
+                }
+
+                saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), val.name + "_" + val.speaker + ".xlsx");
+               } catch (error) {
+                console.log(error);
+               }
+              }
+
+              getAllUrls(apiResources);
+             }}
+            >
+             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z" />
+             </svg>
+            </button>
+            <button
              type="button"
-             class="btn btn-outline-danger"
+             class="btn"
+             style={{ color: "red" }}
              onClick={() => {
               axios
                .post("https://arjunadb.herokuapp.com/webinar/delete", { name: val.name, speaker: val.speaker })
@@ -117,14 +170,13 @@ function Webinar(props) {
                .catch((err) => console.log(err));
              }}
             >
-             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 20 20">
+             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
               <path
                fill-rule="evenodd"
                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
               />
              </svg>
-             Delete
             </button>
            </h5>
 
