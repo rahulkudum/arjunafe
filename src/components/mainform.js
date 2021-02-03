@@ -35,20 +35,19 @@ function Mainform(props) {
          .then((res) => {
           if (res.data) {
            res.data.webinars.push({ name: webinar.name, speaker: webinar.speaker });
-           console.log(res.data.webinars);
+           let users = [...webinar.users];
+           users.push({ name: name, number: number });
+
            axios
-            .post("https://arjunadb.herokuapp.com/user/webinaradd", { number: number, webinars: res.data.webinars })
+            .post("https://arjunadb.herokuapp.com/user/webinaradd", {
+             name: name,
+             number: number,
+             webinarname: webinar.name,
+             webinarspeaker: webinar.speaker,
+            })
             .then((res) => {
-             console.log(res);
-             let users = [...webinar.users];
-             users.push({ name: name, number: number });
-             axios
-              .post("https://arjunadb.herokuapp.com/webinar/useradd", { name: webinar.name, speaker: webinar.speaker, users: users })
-              .then((res) => {
-               console.log(webinar.users, users, "testing", res.data);
-               history.push(`${url}/thankyou`);
-              })
-              .catch((err) => console.log(err));
+             if (!res.data) alert("You have already registered for this webinar");
+             history.push(`${url}/thankyou`);
             })
             .catch((err) => console.log(err));
           } else history.push(`${url}/newform`);

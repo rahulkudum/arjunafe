@@ -16,25 +16,19 @@ function Newform(props) {
     <form
      onSubmit={(e) => {
       e.preventDefault();
+      console.log(number);
+
       axios
        .post("https://arjunadb.herokuapp.com/user/add", {
         name: name,
         number: number,
         school: school,
-        webinars: { name: webinar.name, speaker: webinar.speaker },
+        webinarname: webinar.name,
+        webinarspeaker: webinar.speaker,
        })
        .then((res) => {
         console.log(res);
-        let users = [...webinar.users];
-        users.push({ name: name, number: number });
-        console.log(webinar);
-        axios
-         .post("https://arjunadb.herokuapp.com/webinar/useradd", { name: webinar.name, speaker: webinar.speaker, users: users })
-         .then((res) => {
-          console.log(res);
-          history.push("/webinar/mainform/thankyou");
-         })
-         .catch((err) => console.log(err));
+        history.push("/webinar/firsttime/thankyou");
        })
 
        .catch((err) => console.log(err));
