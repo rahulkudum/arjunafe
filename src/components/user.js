@@ -12,7 +12,7 @@ function User(props) {
   <div className="row">
    <div className="col-4">
     <div className="list-group" id="list-tab" role="tablist">
-     <a className="list-group-item list-group-item-action " data-bs-toggle="list" href="#search-operations" role="tab">
+     <a className="list-group-item list-group-item-action active" data-bs-toggle="list" href="#search-operations" role="tab">
       Search Operations
      </a>
      {userList.map((val, i) => {
@@ -27,7 +27,7 @@ function User(props) {
 
    <div className="col-8">
     <div className="tab-content" id="nav-tabContent">
-     <div className="tab-pane fade page" id="search-operations" role="tabpanel">
+     <div className="tab-pane fade show active page" id="search-operations" role="tabpanel">
       <main className="form-signin query">
        <form
         onSubmit={(e) => {
