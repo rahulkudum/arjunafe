@@ -25,7 +25,6 @@ function App() {
         axios
          .get("https://arjunadb.herokuapp.com/webinar")
          .then((res) => {
-          console.log("kjmb", res.data);
           setWebinarList(res.data);
           history.push("/webinar");
          })

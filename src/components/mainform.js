@@ -8,18 +8,19 @@ import Newform from "./newform";
 function Mainform(props) {
  let history = useHistory();
  let { path, url } = useRouteMatch();
- let { webinardetails } = useParams();
- let webinarName = webinardetails.slice(0, webinardetails.indexOf("^"));
- let webinarSpeaker = webinardetails.slice(webinardetails.indexOf("^") + 1);
+ let { webinarId } = useParams();
 
- const [webinar, setWebinar] = useState([]);
+ const [webinar, setWebinar] = useState({});
  const [name, setName] = useState("");
  const [number, setNumber] = useState();
 
  useEffect(() => {
   axios
-   .post("https://arjunadb.herokuapp.com/webinar/find", { name: webinarName, speaker: webinarSpeaker })
-   .then((res) => setWebinar(res.data))
+   .post("https://arjunadb.herokuapp.com/webinar/find", { webinarid: webinarId })
+   .then((res) => {
+    console.log(res.data);
+    setWebinar(res.data);
+   })
    .catch((err) => console.log(err));
  }, []);
  return (
@@ -34,16 +35,10 @@ function Mainform(props) {
          .post("https://arjunadb.herokuapp.com/user/find", { number: Number(number) })
          .then((res) => {
           if (res.data) {
-           res.data.webinars.push({ name: webinar.name, speaker: webinar.speaker });
-           let users = [...webinar.users];
-           users.push({ name: name, number: number });
-
            axios
             .post("https://arjunadb.herokuapp.com/user/webinaradd", {
-             name: name,
-             number: number,
-             webinarname: webinar.name,
-             webinarspeaker: webinar.speaker,
+             id: res.data._id,
+             webinarid: webinar._id,
             })
             .then((res) => {
              if (!res.data) alert("You have already registered for this webinar");

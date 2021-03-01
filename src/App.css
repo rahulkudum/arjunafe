@@ -36,16 +36,15 @@
  z-index: 2;
 }
 .form-signin .name {
- margin-bottom: -1px;
- margin-left: 10px;
- border-bottom-right-radius: 0;
- border-bottom-left-radius: 0;
-}
-.form-signin .no {
  margin-bottom: 10px;
  margin-left: 10px;
- border-top-left-radius: 0;
- border-top-right-radius: 0;
+}
+.dname {
+ height: 50px;
+}
+.form-signin .no {
+ margin-left: 10px;
+ margin-bottom: 10px;
 }
 
 .card-header {

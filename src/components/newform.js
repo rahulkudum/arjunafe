@@ -7,8 +7,10 @@ function Newform(props) {
  let history = useHistory();
  const [name, setName] = props.name;
  const [number, setNumber] = props.number;
- const [school, setSchool] = useState("");
  const [webinar, setWebinar] = props.webinar;
+ const [dob, setDob] = useState("");
+ const [email, setEmail] = useState("");
+ const [gender, setGender] = useState("");
 
  return (
   <div className="text-center page">
@@ -17,17 +19,27 @@ function Newform(props) {
      onSubmit={(e) => {
       e.preventDefault();
       console.log(number);
-
+      console.log({
+       name: name,
+       number: number,
+       email: email,
+       dob: dob,
+       gender: gender,
+       webinarname: webinar.name,
+       webinarid: webinar._id,
+      });
       axios
        .post("https://arjunadb.herokuapp.com/user/add", {
         name: name,
         number: number,
-        school: school,
+        email: email,
+        dob: dob,
+        gender: gender,
         webinarname: webinar.name,
-        webinarspeaker: webinar.speaker,
+        webinarid: webinar._id,
        })
        .then((res) => {
-        console.log(res);
+        console.log(res.data);
         history.push("/webinar/firsttime/thankyou");
        })
 
@@ -40,7 +52,9 @@ function Newform(props) {
 
      <input type="text" className="form-control name" placeholder="WhatsApp No" value={number} required />
 
-     <input type="text" className="form-control no" placeholder="School" value={school} required autoFocus onChange={(e) => setSchool(e.target.value)} />
+     <input type="text" className="form-control no" placeholder="Email" value={email} required autoFocus onChange={(e) => setEmail(e.target.value)} />
+     <input type="text" className="form-control no" placeholder="Gender" value={gender} required onChange={(e) => setGender(e.target.value)} />
+     <input type="text" className="form-control no" placeholder="Date of Birth" value={dob} required onChange={(e) => setDob(e.target.value)} />
 
      <button className="w-100 btn btn-lg btn-primary" submit>
       Submit

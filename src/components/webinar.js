@@ -13,6 +13,9 @@ function Webinar(props) {
  const [currentWebinar, setCurrentWebinar] = useState([]);
  const [webinarName, setWebinarName] = useState("");
  const [speakerName, setSpeakerName] = useState("");
+ const [date, setDate] = useState("");
+ const [guest, setGuest] = useState("");
+ const [description, setDescription] = useState("");
 
  return (
   <Switch>
@@ -28,12 +31,7 @@ function Webinar(props) {
         .reverse()
         .map((val, i) => {
          return (
-          <a
-           className="list-group-item list-group-item-action "
-           data-bs-toggle="list"
-           href={`#${val.name.split(" ").join("")}_${val.speaker.split(" ").join("")}`}
-           role="tab"
-          >
+          <a className="list-group-item list-group-item-action " data-bs-toggle="list" href={`#a${val._id}`} role="tab">
            {val.name}
           </a>
          );
@@ -50,19 +48,18 @@ function Webinar(props) {
            e.preventDefault();
 
            axios
-            .post("https://arjunadb.herokuapp.com/webinar/add", { name: webinarName, speaker: speakerName })
+            .post("https://arjunadb.herokuapp.com/webinar/add", { name: webinarName, speaker: speakerName, date: date, guest: guest, description: description })
             .then((res) => {
-             if (res.data) {
-              setWebinarList((prev) => {
-               let dummy = [...prev];
-               dummy.push({ name: webinarName, speaker: speakerName, users: [] });
-               return dummy;
-              });
-              setWebinarName("");
-              setSpeakerName("");
-             } else {
-              alert("Webinar already exsists");
-             }
+             setWebinarList((prev) => {
+              let dummy = [...prev];
+              dummy.push({ name: webinarName, speaker: speakerName, date: date, guest: guest, description: description, users: [] });
+              return dummy;
+             });
+             setWebinarName("");
+             setSpeakerName("");
+             setDate("");
+             setGuest("");
+             setDescription("");
             })
             .catch((err) => console.log(err));
           }}
@@ -89,6 +86,36 @@ function Webinar(props) {
             setSpeakerName(e.target.value);
            }}
           />
+          <input
+           type="text"
+           className="form-control no"
+           placeholder="Date"
+           required
+           value={date}
+           onChange={(e) => {
+            setDate(e.target.value);
+           }}
+          />
+          <input
+           type="text"
+           className="form-control no"
+           placeholder="Cheif Guest"
+           required
+           value={guest}
+           onChange={(e) => {
+            setGuest(e.target.value);
+           }}
+          />
+          <input
+           type="text"
+           className="form-control no"
+           placeholder="Description"
+           required
+           value={description}
+           onChange={(e) => {
+            setDescription(e.target.value);
+           }}
+          />
 
           <button className="w-100 btn btn-lg btn-primary" submit>
            Create
@@ -99,7 +126,7 @@ function Webinar(props) {
 
        {webinarList.map((val, i) => {
         return (
-         <div className="tab-pane fade" id={`${val.name.split(" ").join("")}_${val.speaker.split(" ").join("")}`} role="tabpanel">
+         <div className="tab-pane fade" id={`a${val._id}`} role="tabpanel">
           <div class="card">
            <h5 class="card-header">
             Webinar Details
@@ -108,16 +135,33 @@ function Webinar(props) {
              style={{ color: "green" }}
              onClick={() => {
               const apiResources = val.users.map((user, j) => {
-               return { number: user.number };
+               return { id: user.id };
               });
 
               async function getAllUrls(urls) {
                try {
-                var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/find", url).then((res) => res.data)));
+                var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/findbyid", url).then((res) => res.data)));
                 const excelArray = datas
                  .filter((data) => data)
                  .map((data, i) => {
-                  return [data.name, data.number, data.school];
+                  return [
+                   data.name,
+                   data.number,
+                   data.email,
+                   data.gender,
+                   data.dob,
+                   data.beyr10,
+                   data.beyr12,
+                   data.eeyr,
+                   data.educationid,
+                   data.volunteerwork,
+                   data.arjunapoc,
+                   data.communicationmethod,
+                   data.subscriptionstatus,
+                   data.lastcontact,
+                   data.webinarscount,
+                   data.coursescount,
+                  ];
                  });
 
                 var wb = XLSX.utils.book_new();
@@ -130,7 +174,27 @@ function Webinar(props) {
 
                 wb.SheetNames.push("Registered Students");
 
-                var ws = XLSX.utils.aoa_to_sheet([["Name", "WhatsApp No", "School"], ...excelArray]);
+                var ws = XLSX.utils.aoa_to_sheet([
+                 [
+                  "Name",
+                  "Phone No",
+                  "Email",
+                  "Gender",
+                  "DOB",
+                  "10BEYr",
+                  "12BEYr",
+                  "EEYr",
+                  "EducationId",
+                  "VolunteerWork",
+                  "ArjunaPOC",
+                  "CommunicationMethod",
+                  "SubscriptionStatus",
+                  "LastContact",
+                  "WebinarsCount",
+                  "CoursesCount",
+                 ],
+                 ...excelArray,
+                ]);
                 wb.Sheets["Registered Students"] = ws;
                 var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
                 function s2ab(s) {
@@ -159,7 +223,7 @@ function Webinar(props) {
              style={{ color: "red" }}
              onClick={() => {
               axios
-               .post("https://arjunadb.herokuapp.com/webinar/delete", { name: val.name, speaker: val.speaker })
+               .post("https://arjunadb.herokuapp.com/webinar/delete", { id: val._id })
                .then((res) => {
                 setWebinarList((prev) => {
                  return prev.filter((item, k) => k !== i);
@@ -181,11 +245,14 @@ function Webinar(props) {
            <div class="card-body">
             <h5 class="card-title">{val.name}</h5>
             <p class="card-text">{val.speaker}</p>
+            <p class="card-text">Date: {val.date}</p>
+            <p class="card-text">Cheif Guset: {val.guest}</p>
+            <p class="card-text">Description: {val.description}</p>
             <a
              className="btn btn-primary"
              onClick={() => {
               setCurrentWebinar(val);
-              history.push(`${url}/${val.name}^${val.speaker}`);
+              history.push(`${url}/${val._id}`);
              }}
             >
              Link
@@ -204,11 +271,11 @@ function Webinar(props) {
                    style={{ width: "80%" }}
                    className="btn"
                    data-bs-toggle="collapse"
-                   data-bs-target={`#${user.name.split(" ").join("")}_${user.number}`}
+                   data-bs-target={`#a${user.id}`}
                    onClick={() => {
                     if (!user.data) {
                      axios
-                      .post("https://arjunadb.herokuapp.com/user/find", { number: user.number })
+                      .post("https://arjunadb.herokuapp.com/user/findbyid", { id: user.id })
                       .then((res) => {
                        console.log(res.data);
                        setWebinarList((prev) => {
@@ -228,11 +295,11 @@ function Webinar(props) {
                    style={{ width: "10%", color: "red" }}
                    onClick={() => {
                     axios
-                     .post("https://arjunadb.herokuapp.com/webinar/userdelete", { number: user.number, webinarname: val.name, webinarspeaker: val.speaker })
+                     .post("https://arjunadb.herokuapp.com/webinar/userdelete", { id: user.id, webinarid: val._id })
                      .then((res) => {
                       setWebinarList((prev) => {
                        let dummy = [...prev];
-                       dummy[i].users = dummy[i].users.filter((duser) => duser.number != user.number);
+                       dummy[i].users = dummy[i].users.filter((duser) => duser.id != user.id);
                        return dummy;
                       });
                      })
@@ -248,19 +315,17 @@ function Webinar(props) {
                    </svg>
                   </button>
                  </div>
-                 <div class="collapse" id={`${user.name.split(" ").join("")}_${user.number}`}>
+                 <div class="collapse" id={`a${user.id}`}>
                   <div class="card card-body">
                    {user.data ? (
                     <div>
-                     <p>{user.data.number}</p>
-                     <p>{user.data.school}</p>
+                     <p>Phone No: {user.data.number}</p>
+                     <p>Email: {user.data.email}</p>
+                     <p>DOB: {user.data.dob}</p>
+                     <p>Gender: {user.data.gender}</p>
                      <p style={{ fontWeight: "bold" }}>Webinars attended</p>
                      {user.data.webinars.map((item, i) => {
-                      return (
-                       <p>
-                        {item.name} {item.speaker}
-                       </p>
-                      );
+                      return <p>{item.name}</p>;
                      })}
                     </div>
                    ) : null}
@@ -280,7 +345,7 @@ function Webinar(props) {
      </div>
     </div>
    </Route>
-   <Route path={`${path}/:webinardetails`}>
+   <Route path={`${path}/:webinarId`}>
     <Mainform webinar={[currentWebinar, setCurrentWebinar]} />
    </Route>
   </Switch>
