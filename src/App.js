@@ -26,7 +26,7 @@ function App() {
       <main className="form-login">
        <img className="mb-4" src={logo} alt="" />
        <GoogleLogin
-        clientId="526565895378-md97pueiv8m2t3c682eamv293tt4gaa6.apps.googleusercontent.com"
+        clientId="526565895378-0u79l74057grs0n8ekqaa1kvb3htt3ej.apps.googleusercontent.com"
         render={(renderProps) => (
          <button onClick={renderProps.onClick} className="btn btn-lg btn-primary">
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
