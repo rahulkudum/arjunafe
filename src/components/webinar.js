@@ -448,7 +448,7 @@ function Webinar(props) {
       <form className={classes.container} noValidate>
        <TextField
         id="date"
-        label="Birthday"
+        label="Date"
         type="date"
         defaultValue={new Date().toISOString().slice(0, 10)}
         className={classes.textField}

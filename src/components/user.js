@@ -430,7 +430,7 @@ function User(props) {
      </DialogActions>
     </Dialog>
     <Dialog fullScreen={fullScreen} fullWidth={true} maxWidth={"xl"} open={open1} onClose={() => {}} aria-labelledby="responsive-dialog-title">
-     <DialogTitle id="responsive-dialog-title">No of Students: {userList.length}</DialogTitle>
+     <DialogTitle id="responsive-dialog-title">Search Students</DialogTitle>
      <DialogContent>
       {search.map((item, i) => {
        return (
@@ -589,7 +589,7 @@ function User(props) {
     </Dialog>
 
     <Dialog fullScreen={fullScreen} fullWidth={true} maxWidth={"xl"} open={open2} onClose={() => {}} aria-labelledby="responsive-dialog-title">
-     <DialogTitle id="responsive-dialog-title">{"New Webinar"}</DialogTitle>
+     <DialogTitle id="responsive-dialog-title">{"Update Students"}</DialogTitle>
      <DialogContent>
       {search2.map((item, i) => {
        return (

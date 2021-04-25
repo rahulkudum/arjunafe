@@ -68,7 +68,7 @@ function Form() {
            <input type="text" className="form-control name" placeholder="Full Name" value={name} required autoFocus onChange={(e) => setName(e.target.value)} />
 
            <input type="text" className="form-control name" placeholder="WhatsApp No" value={number} required onChange={(e) => setNumber(e.target.value)} />
-
+           <br />
            <button className="w-100 btn btn-lg btn-primary" submit>
             Submit
            </button>
@@ -125,7 +125,7 @@ function Form() {
             <input type="text" className="form-control name" placeholder="Gender" value={gender} required onChange={(e) => setGender(e.target.value)} />
            ) : null}
            <input type="text" className="form-control name" placeholder="Date of Birth" value={dob} required onChange={(e) => setDob(e.target.value)} />
-
+           <br />
            <button className="w-100 btn btn-lg btn-primary" submit>
             Submit
            </button>

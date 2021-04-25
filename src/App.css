@@ -6,6 +6,12 @@
  background-size: cover;
 }
 
+.page2 {
+ height: 100vh;
+ width: 100%;
+ position: relative;
+}
+
 .form-login {
  width: 100%;
  max-width: 400px;
