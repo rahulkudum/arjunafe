@@ -7,6 +7,7 @@ import "./App.css";
 import Webinar from "./components/webinar";
 import Pwebinar from "./components/pwebinar";
 import User from "./components/user";
+import Institute from "./components/institute";
 import logo from "./logo.png";
 import { AdminName, AdminPhoto } from "./components/context/storage";
 import Form from "./components/form";
@@ -53,8 +54,8 @@ function App() {
    </Route>
 
    <Route path="/webinar">{name ? <Webinar /> : <Redirect to="/" />}</Route>
-
    <Route path="/student">{name ? <User /> : <Redirect to="/" />}</Route>
+   <Route path="/institute">{name ? <Institute /> : <Redirect to="/" />}</Route>
    <Route path="/form/:webinarId">
     <Form />
    </Route>

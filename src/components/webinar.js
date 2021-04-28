@@ -19,6 +19,20 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers";
+import {
+ EmailShareButton,
+ FacebookShareButton,
+ LinkedinShareButton,
+ TelegramShareButton,
+ TwitterShareButton,
+ WhatsappShareButton,
+ EmailIcon,
+ FacebookIcon,
+ LinkedinIcon,
+ TelegramIcon,
+ TwitterIcon,
+ WhatsappIcon,
+} from "react-share";
 
 import ResponsiveDrawer from "./ui/drawer";
 import { UserList, WebinarList, Filter } from "./context/storage";
@@ -56,27 +70,33 @@ function Webinar(props) {
  const [webinarList, setWebinarList] = useContext(WebinarList);
  const [access, setAccess] = useState("");
  const [pwebinarList, setPwebinarList] = useState([]);
+ const [instituteList, setInstituteList] = useState([]);
  const [userList, setUserList] = useContext(UserList);
  const [filter, setFilter] = useContext(Filter);
  const [currentWebinar, setCurrentWebinar] = useState([]);
+ const [currentWebinarNo, setCurrentWebinarNo] = useState([]);
  const [webinarName, setWebinarName] = useState("");
  const [webinarId, setWebinarId] = useState("");
  const [webinarPname, setWebinarPname] = useState("");
  const [webinarDescription, setWebinarDescription] = useState("");
  const [webinarLevel, setWebinarLevel] = useState("");
  const [speakerName, setSpeakerName] = useState("");
- const [date, setDate] = useState("");
+ const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
  const [guest, setGuest] = useState("");
- const [institute, setInstitute] = useState("");
+ const [instituteId, setInstituteId] = useState("");
+ const [start, setStart] = useState(0);
  const [open, setOpen] = useState(false);
  const [open1, setOpen1] = useState(false);
  const [open2, setOpen2] = useState(false);
  const [open3, setOpen3] = useState(false);
  const [open4, setOpen4] = useState(false);
+ const [open5, setOpen5] = useState(false);
+ const [open6, setOpen6] = useState(false);
+ const [open7, setOpen7] = useState(false);
  const [backdrop, setBackdrop] = useState(false);
  const [search, setSearch] = useState([{ property: "name", operator: "=", value: "" }]);
  const [search2, setSearch2] = useState([{ property: "name", operator: "=", value: "" }]);
- const [selectedDate, setSelectedDate] = useState(new Date());
+ const [instituteFields, setInstituteFields] = useState({ name: "", campus: "", location: "", inumber: "", imail: "", pnumber: "", pmail: "", poc: "" });
 
  useEffect(() => {
   if (!filter) {
@@ -95,9 +115,25 @@ function Webinar(props) {
          }
         }
        }
-       setWebinarList(res.data);
-       setFilter(false);
-       setBackdrop(false);
+
+       axios
+        .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+        .then((res3) => {
+         for (let i = 0; i < res.data.length; i++) {
+          for (let j = 0; j < res3.data.length; j++) {
+           if (res3.data[j]._id === res.data[i].institute) {
+            res.data[i].pinstitute = res3.data[j];
+            break;
+           }
+          }
+         }
+         setWebinarList(res.data);
+         setFilter(false);
+         setBackdrop(false);
+        })
+        .catch((err) => {
+         console.log(err);
+        });
       })
       .catch((err) => alert(err));
     })
@@ -155,8 +191,17 @@ function Webinar(props) {
            .then((res) => {
             setPwebinarList(res.data);
             setWebinarId(res.data[0]._id);
-            setBackdrop(false);
-            setOpen(true);
+            axios
+             .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+             .then((resp) => {
+              setInstituteList(resp.data);
+              setInstituteId(resp.data[0]._id);
+              setBackdrop(false);
+              setOpen(true);
+             })
+             .catch((err) => {
+              console.log(err);
+             });
            })
            .catch((err) => alert(err));
          }}
@@ -196,199 +241,264 @@ function Webinar(props) {
          <th scope="col">Date</th>
          <th scope="col">Name</th>
          <th scope="col">Speaker</th>
-         <th scope="col">Institute</th>
          <th scope="col">Guest</th>
+         <th scope="col">Institute</th>
          <th scope="col">Students</th>
          <th scope="col">Actions</th>
         </tr>
        </thead>
        <tbody>
         {webinarList.map((val, i) => {
-         return (
-          <tr>
-           <th
-            onClick={() => {
-             popup(val);
-            }}
-            scope="row"
-           >
-            {i + 1}
-           </th>
-           <td
-            onClick={() => {
-             popup(val);
-            }}
-           >
-            {val.date}
-           </td>
-           <td
-            onClick={() => {
-             popup(val);
-            }}
-           >
-            {val.pwebinar.name}
-           </td>
-           <td
-            onClick={() => {
-             popup(val);
-            }}
-           >
-            {val.speaker}
-           </td>
-           <td
-            onClick={() => {
-             popup(val);
-            }}
-           >
-            {val.institute}
-           </td>
-           <td
-            onClick={() => {
-             popup(val);
-            }}
-           >
-            {val.guest}
-           </td>
-           <td
-            onClick={() => {
-             popup(val);
-            }}
-           >
-            {val.userscount}
-           </td>
-           <td>
-            <button
-             className="btn"
-             style={{ color: "blue" }}
+         if (i >= start && i <= start + 9) {
+          return (
+           <tr>
+            <th
              onClick={() => {
-              setCurrentWebinar(val);
-              history.push(`/form/${val._id}`);
+              popup(val);
+             }}
+             scope="row"
+            >
+             {i + 1}
+            </th>
+            <td
+             onClick={() => {
+              popup(val);
              }}
             >
-             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
-              <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
-             </svg>
-            </button>
-            <button
-             className="btn"
-             style={{ color: "green" }}
+             {val.date}
+            </td>
+            <td
              onClick={() => {
-              const apiResources = val.users.map((user, j) => {
-               return { id: user };
-              });
+              popup(val);
+             }}
+            >
+             {val.pwebinar.name.length <= 80 ? val.pwebinar.name : val.pwebinar.name.slice(0, 40) + "..."}
+            </td>
+            <td
+             onClick={() => {
+              popup(val);
+             }}
+            >
+             {val.speaker}
+            </td>
+            <td
+             onClick={() => {
+              popup(val);
+             }}
+            >
+             {val.guest}
+            </td>
+            <td
+             onClick={() => {
+              popup(val);
+             }}
+            >
+             {val.pinstitute.name.length <= 20 ? val.pinstitute.name : val.pinstitute.name.slice(0, 19) + "..."}
+            </td>
+            <td
+             onClick={() => {
+              popup(val);
+             }}
+            >
+             {val.userscount}
+            </td>
+            <td>
+             <button
+              className="btn"
+              style={{ color: "blue" }}
+              onClick={() => {
+               //  history.push(`/form/${val._id}`);
+               setOpen7(true);
+              }}
+             >
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+               <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+              </svg>
+             </button>
+             <button
+              className="btn"
+              style={{ color: "green" }}
+              onClick={() => {
+               const apiResources = val.users.map((user, j) => {
+                return { id: user };
+               });
 
-              async function getAllUrls(urls) {
-               try {
-                var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/findbyid", url).then((res) => res.data)));
-                const excelArray = datas
-                 .filter((data) => data)
-                 .map((data, i) => {
-                  return [
-                   data.name,
-                   data.number,
-                   data.email,
-                   data.gender,
-                   data.dob,
-                   data.beyr10,
-                   data.beyr12,
-                   data.eeyr,
-                   data.educationid,
-                   data.volunteerwork,
-                   data.arjunapoc,
-                   data.communicationmethod,
-                   data.subscriptionstatus,
-                   data.lastcontact,
-                   data.webinarscount,
-                   data.coursescount,
-                  ];
-                 });
+               async function getAllUrls(urls) {
+                try {
+                 var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/findbyid", url).then((res) => res.data)));
+                 const excelArray = datas
+                  .filter((data) => data)
+                  .map((data, i) => {
+                   return [
+                    data.name,
+                    data.number,
+                    data.email,
+                    data.gender,
+                    data.dob,
+                    data.beyr10,
+                    data.beyr12,
+                    data.eeyr,
+                    data.educationid,
+                    data.volunteerwork,
+                    data.arjunapoc,
+                    data.communicationmethod,
+                    data.subscriptionstatus,
+                    data.lastcontact,
+                    data.webinarscount,
+                    data.coursescount,
+                   ];
+                  });
 
-                var wb = XLSX.utils.book_new();
-                wb.Props = {
-                 Title: "Registered Students",
-                 Subject: "Registered Students",
-                 Author: "Arjuna",
-                 CreatedDate: new Date(),
-                };
+                 var wb = XLSX.utils.book_new();
+                 wb.Props = {
+                  Title: "Registered Students",
+                  Subject: "Registered Students",
+                  Author: "Arjuna",
+                  CreatedDate: new Date(),
+                 };
 
-                wb.SheetNames.push("Registered Students");
+                 wb.SheetNames.push("Registered Students");
 
-                var ws = XLSX.utils.aoa_to_sheet([
-                 [
-                  "Name",
-                  "Phone name",
-                  "Email",
-                  "Gender",
-                  "DOB",
-                  "10BEYr",
-                  "12BEYr",
-                  "EEYr",
-                  "EducationId",
-                  "VolunteerWork",
-                  "ArjunaPOC",
-                  "CommunicationMethod",
-                  "SubscriptionStatus",
-                  "LastContact",
-                  "WebinarsCount",
-                  "CoursesCount",
-                 ],
-                 ...excelArray,
-                ]);
-                wb.Sheets["Registered Students"] = ws;
-                var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
-                function s2ab(s) {
-                 var buf = new ArrayBuffer(s.length);
-                 var view = new Uint8Array(buf);
-                 for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
-                 return buf;
+                 var ws = XLSX.utils.aoa_to_sheet([
+                  [
+                   "Name",
+                   "Phone name",
+                   "Email",
+                   "Gender",
+                   "DOB",
+                   "10BEYr",
+                   "12BEYr",
+                   "EEYr",
+                   "EducationId",
+                   "VolunteerWork",
+                   "ArjunaPOC",
+                   "CommunicationMethod",
+                   "SubscriptionStatus",
+                   "LastContact",
+                   "WebinarsCount",
+                   "CoursesCount",
+                  ],
+                  ...excelArray,
+                 ]);
+                 wb.Sheets["Registered Students"] = ws;
+                 var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+                 function s2ab(s) {
+                  var buf = new ArrayBuffer(s.length);
+                  var view = new Uint8Array(buf);
+                  for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+                  return buf;
+                 }
+
+                 saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), val.pwebinar.name + " (" + val.date + ")" + ".xlsx");
+                } catch (error) {
+                 console.log(error);
                 }
-
-                saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), val.pwebinar.name + " (" + val.date + ")" + ".xlsx");
-               } catch (error) {
-                console.log(error);
                }
-              }
 
-              getAllUrls(apiResources);
-             }}
-            >
-             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
-              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z" />
-             </svg>
-            </button>
-            <button
-             type="button"
-             class="btn"
-             style={{ color: "red" }}
-             onClick={() => {
-              setBackdrop(true);
-              axios
-               .post("https://arjunadb.herokuapp.com/webinar/delete", { id: val._id })
-               .then((res) => {
-                console.log(res);
-                setWebinarList((prev) => {
-                 return prev.filter((item, k) => k !== i);
-                });
-                setBackdrop(false);
-               })
-               .catch((err) => console.log(err));
-             }}
-            >
-             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-              <path
-               fill-rule="evenodd"
-               d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-              />
-             </svg>
-            </button>
-           </td>
-          </tr>
-         );
+               getAllUrls(apiResources);
+              }}
+             >
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+               <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z" />
+              </svg>
+             </button>
+             <button
+              type="button"
+              class="btn"
+              style={{ color: "blue" }}
+              onClick={() => {
+               setCurrentWebinar(val);
+               setCurrentWebinarNo(i);
+               setOpen6(true);
+              }}
+             >
+              <svg
+               xmlns="http://www.w3.org/2000/svg"
+               width="30"
+               height="30"
+               fill="currentColor"
+               class="bi bi-file-earmark-spreadsheet-fill"
+               viewBox="0 0 16 16"
+              >
+               <path d="M6 12v-2h3v2H6z" />
+               <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM3 9h10v1h-3v2h3v1h-3v2H9v-2H6v2H5v-2H3v-1h2v-2H3V9z" />
+              </svg>
+             </button>
+             <button
+              type="button"
+              class="btn"
+              style={{ color: "red" }}
+              onClick={() => {
+               setBackdrop(true);
+               axios
+                .post("https://arjunadb.herokuapp.com/webinar/delete", { id: val._id })
+                .then((res) => {
+                 console.log(res);
+                 setWebinarList((prev) => {
+                  return prev.filter((item, k) => k !== i);
+                 });
+                 setBackdrop(false);
+                })
+                .catch((err) => console.log(err));
+              }}
+             >
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+               <path
+                fill-rule="evenodd"
+                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+               />
+              </svg>
+             </button>
+            </td>
+           </tr>
+          );
+         } else {
+          return null;
+         }
         })}
        </tbody>
       </table>
      </div>
+     <p style={{ textAlign: "center" }}>
+      <button
+       className="btn"
+       style={{ color: "blue" }}
+       onClick={() => {
+        if (start === 0) {
+         setStart(webinarList.length - (webinarList.length % 10));
+        } else {
+         setStart(start - 10);
+        }
+       }}
+      >
+       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+        <path
+         fill-rule="evenodd"
+         d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"
+        />
+       </svg>
+      </button>
+      Displaying {start + 1} - {start + 10 > webinarList.length ? webinarList.length : start + 10} of {webinarList.length}{" "}
+      <button
+       className="btn"
+       style={{ color: "blue" }}
+       onClick={() => {
+        if (start + 10 > webinarList.length) {
+         setStart(0);
+        } else {
+         setStart(start + 10);
+        }
+       }}
+      >
+       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">
+        <path
+         fill-rule="evenodd"
+         d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"
+        />
+       </svg>
+      </button>
+     </p>
     </main>
 
     <Dialog fullScreen={fullScreen} open={open} onClose={() => {}} aria-labelledby="responsive-dialog-title">
@@ -435,16 +545,26 @@ function Webinar(props) {
        }}
        fullWidth
       />
-      <TextField
-       margin="dense"
-       label="Institute"
-       type="text"
-       value={institute}
-       onChange={(e) => {
-        setInstitute(e.target.value);
-       }}
-       fullWidth
-      />
+      <FormControl className={classes.formControl}>
+       <InputLabel>Institute</InputLabel>
+       <Select
+        native
+        value={instituteId}
+        onChange={(e) => {
+         if (e.target.value !== "new") {
+          setInstituteId(e.target.value);
+         } else {
+          setOpen5(true);
+         }
+        }}
+       >
+        {instituteList.map((val, i) => {
+         return <option value={val._id}>{val.name + " " + val.campus + " " + val.location}</option>;
+        })}
+        <option value={"new"}>New Institute</option>
+       </Select>
+      </FormControl>
+
       <form className={classes.container} noValidate>
        <TextField
         id="date"
@@ -480,20 +600,23 @@ function Webinar(props) {
           speaker: speakerName,
           date: date,
           guest: guest,
-          institute: institute,
+          institute: instituteId,
          })
-         .then(() => {
-          axios.post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: webinarId }).then((res) => {
-           setWebinarList((prev) => {
-            let dummy = [...prev];
-            dummy.push({ webinarid: webinarId, speaker: speakerName, date: date, guest: guest, institute: institute, users: [], pwebinar: res.data });
-            return dummy;
+         .then((res) => {
+          axios.post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: webinarId }).then((res2) => {
+           axios.post("https://arjunadb.herokuapp.com/pwebinar/findinstitute", { instituteid: instituteId }).then((res3) => {
+            res.data.pwebinar = res2.data;
+            res.data.pinstitute = res3.data;
+            setWebinarList((prev) => {
+             let dummy = [...prev];
+             dummy.push(res.data);
+             return dummy;
+            });
+            setSpeakerName("");
+            setGuest("");
+            setBackdrop(false);
+            setOpen(false);
            });
-           setSpeakerName("");
-           setGuest("");
-           setInstitute("");
-           setBackdrop(false);
-           setOpen(false);
           });
          })
          .catch((err) => console.log(err));
@@ -797,7 +920,7 @@ function Webinar(props) {
          })
          .then((res) => {
           setPwebinarList((prev) => {
-           let dum = [...pwebinarList];
+           let dum = [...prev];
            dum.push(res.data);
            return dum;
           });
@@ -809,6 +932,269 @@ function Webinar(props) {
        color="primary"
       >
        Next
+      </Button>
+     </DialogActions>
+    </Dialog>
+
+    <Dialog fullScreen={fullScreen} open={open5} onClose={() => {}} aria-labelledby="responsive-dialog-title">
+     <DialogTitle id="responsive-dialog-title">{"New Institute"}</DialogTitle>
+     <DialogContent>
+      <TextField
+       autoFocus
+       margin="dense"
+       label="Institute Name"
+       type="text"
+       value={instituteFields.name}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.name = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Campus"
+       type="text"
+       value={instituteFields.campus}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.campus = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Location"
+       type="text"
+       value={instituteFields.location}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.location = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Institute Ph. no."
+       type="text"
+       value={instituteFields.inumber}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.inumber = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Institute Email"
+       type="text"
+       value={instituteFields.imail}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.imail = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Personal Ph. no."
+       type="text"
+       value={instituteFields.pnumber}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.pnumber = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Personal Email"
+       type="text"
+       value={instituteFields.pmail}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.pmail = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+      <TextField
+       margin="dense"
+       label="Arjuna POC"
+       type="text"
+       value={instituteFields.poc}
+       onChange={(e) => {
+        setInstituteFields((prev) => {
+         let dum = { ...prev };
+         dum.poc = e.target.value;
+         return dum;
+        });
+       }}
+       fullWidth
+      />
+     </DialogContent>
+     <DialogActions>
+      <Button
+       onClick={() => {
+        setOpen5(false);
+       }}
+       color="primary"
+      >
+       Cancel
+      </Button>
+      <Button
+       onClick={() => {
+        setBackdrop(true);
+        axios
+         .post("https://arjunadb.herokuapp.com/pwebinar/addinstitute", {
+          name: instituteFields.name,
+          campus: instituteFields.campus,
+          location: instituteFields.location,
+          inumber: instituteFields.inumber,
+          imail: instituteFields.imail,
+          pnumber: instituteFields.pnumber,
+          pmail: instituteFields.pmail,
+          poc: instituteFields.poc,
+         })
+         .then((res) => {
+          setInstituteList((prev) => {
+           let dum = [...prev];
+           dum.push(res.data);
+           return dum;
+          });
+          setBackdrop(false);
+          setOpen5(false);
+         })
+         .catch((err) => console.log(err));
+       }}
+       color="primary"
+      >
+       Next
+      </Button>
+     </DialogActions>
+    </Dialog>
+
+    <Dialog fullScreen={fullScreen} open={open6} onClose={() => {}} aria-labelledby="responsive-dialog-title">
+     <DialogTitle id="responsive-dialog-title">{"Import Excel Data"}</DialogTitle>
+     <DialogContent>
+      <input
+       type="file"
+       onChange={(e) => {
+        setBackdrop(true);
+        var files = e.target.files,
+         f = files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+         var data = e.target.result;
+         let readedData = XLSX.read(data, { type: "binary" });
+         const wsname = readedData.SheetNames[0];
+         const ws = readedData.Sheets[wsname];
+
+         /* Convert array to json*/
+         const students = XLSX.utils.sheet_to_json(ws, { header: 1 });
+         students.shift();
+
+         students.map((val, i) => {
+          if (!val[2]) {
+           val[2] = "";
+          }
+          if (!val[3]) {
+           val[3] = "";
+          }
+         });
+         console.log(students);
+         console.log(currentWebinar._id, currentWebinar.webinarid);
+
+         axios
+          .post("https://arjunadb.herokuapp.com/webinar/addusers", {
+           id: currentWebinar._id,
+           wid: currentWebinar.webinarid,
+           eid: currentWebinar.institute,
+           details: students,
+          })
+          .then(() => {
+           axios
+            .post("https://arjunadb.herokuapp.com/webinar/find", { webinarid: currentWebinar._id })
+            .then((res) => {
+             let webinarlist = webinarList;
+             webinarlist[currentWebinarNo].users = res.data.users;
+             webinarlist[currentWebinarNo].userscount = res.data.userscount;
+             setWebinarList(webinarlist);
+             setBackdrop(false);
+             alert("sucessfully imported the student list");
+             setOpen6(false);
+            })
+            .catch((err) => {
+             console.log(err);
+            });
+          })
+          .catch((err) => {
+           console.log(err);
+          });
+        };
+        reader.readAsBinaryString(f);
+       }}
+      />
+     </DialogContent>
+     <DialogActions>
+      <Button
+       onClick={() => {
+        setOpen6(false);
+       }}
+       color="primary"
+      >
+       Cancel
+      </Button>
+     </DialogActions>
+    </Dialog>
+
+    <Dialog fullScreen={fullScreen} open={open7} onClose={() => {}} aria-labelledby="responsive-dialog-title">
+     <DialogTitle id="responsive-dialog-title">{"Share"}</DialogTitle>
+     <DialogContent>
+      <EmailShareButton url={"https://arjunafe.herokuapp.com"}>
+       <EmailIcon />
+      </EmailShareButton>
+      <FacebookShareButton url={"https://arjunafe.herokuapp.com"}>
+       <FacebookIcon />
+      </FacebookShareButton>
+      <WhatsappShareButton url={"https://arjunafe.herokuapp.com"}>
+       <WhatsappIcon />
+      </WhatsappShareButton>
+      <TwitterShareButton url={"https://arjunafe.herokuapp.com"}>
+       <TwitterIcon />
+      </TwitterShareButton>
+      <TelegramShareButton url={"https://arjunafe.herokuapp.com"}>
+       <TelegramIcon />
+      </TelegramShareButton>
+     </DialogContent>
+     <DialogActions>
+      <Button
+       onClick={() => {
+        setOpen7(false);
+       }}
+       color="primary"
+      >
+       Cancel
       </Button>
      </DialogActions>
     </Dialog>

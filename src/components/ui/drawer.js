@@ -107,7 +107,12 @@ function ResponsiveDrawer(props) {
      </ListItemIcon>
      <ListItemText primary={"Webinars"} />
     </ListItem>
-    <ListItem button>
+    <ListItem
+     button
+     onClick={() => {
+      history.push("/institute");
+     }}
+    >
      <ListItemIcon>
       <BusinessIcon />
      </ListItemIcon>

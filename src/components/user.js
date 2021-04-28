@@ -299,7 +299,7 @@ function User(props) {
         />
        </svg>
       </button>
-      Displaying {start + 1} - {start + 10} of {userList.length}{" "}
+      Displaying {start + 1} - {start + 10 > userList.length ? userList.length : start + 10} of {userList.length}{" "}
       <button
        className="btn"
        style={{ color: "blue" }}
