@@ -5,7 +5,7 @@ import { GoogleLogin } from "react-google-login";
 
 import "./App.css";
 import Webinar from "./components/webinar";
-import Pwebinar from "./components/pwebinar";
+
 import User from "./components/user";
 import Institute from "./components/institute";
 import logo from "./logo.png";
