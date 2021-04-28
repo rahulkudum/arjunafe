@@ -195,7 +195,7 @@ function Webinar(props) {
              .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
              .then((resp) => {
               setInstituteList(resp.data);
-              setInstituteId(resp.data[0]._id);
+              setInstituteId("");
               setBackdrop(false);
               setOpen(true);
              })
@@ -293,7 +293,7 @@ function Webinar(props) {
               popup(val);
              }}
             >
-             {val.pinstitute.name.length <= 20 ? val.pinstitute.name : val.pinstitute.name.slice(0, 19) + "..."}
+             {val.pinstitute ? (val.pinstitute.name.length <= 20 ? val.pinstitute.name : val.pinstitute.name.slice(0, 19) + "...") : "Public Webinar"}
             </td>
             <td
              onClick={() => {
@@ -650,7 +650,6 @@ function Webinar(props) {
        fullWidth
       />
       <FormControl className={classes.formControl}>
-       <InputLabel>Institute</InputLabel>
        <Select
         native
         value={instituteId}
@@ -662,6 +661,7 @@ function Webinar(props) {
          }
         }}
        >
+        <option value={""}>Public Webinar</option>
         {instituteList.map((val, i) => {
          return <option value={val._id}>{val.name + " " + val.campus + " " + val.location}</option>;
         })}
@@ -710,7 +710,9 @@ function Webinar(props) {
           axios.post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: webinarId }).then((res2) => {
            axios.post("https://arjunadb.herokuapp.com/pwebinar/findinstitute", { instituteid: instituteId }).then((res3) => {
             res.data.pwebinar = res2.data;
-            res.data.pinstitute = res3.data;
+            if (instituteId !== "") {
+             res.data.pinstitute = res3.data;
+            }
             setWebinarList((prev) => {
              let dummy = [...prev];
              dummy.push(res.data);
