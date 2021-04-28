@@ -18,7 +18,7 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import ResponsiveDrawer from "./ui/drawer";
-import { UserList, WebinarList, Filter } from "./context/storage";
+import { UserList, WebinarList } from "./context/storage";
 
 const useStyles = makeStyles((theme) => ({
  root: {
@@ -52,7 +52,7 @@ function User(props) {
 
  const [userList, setUserList] = useContext(UserList);
  const [webinarList, setWebinarList] = useContext(WebinarList);
- const [filter, setFilter] = useContext(Filter);
+ const [webinarList2, setWebinarList2] = useState([]);
  const [query, setQuery] = useState("");
  const [search, setSearch] = useState([{ property: "name", operator: "=", value: "" }]);
  const [search2, setSearch2] = useState([{ property: "name", operator: "=", value: "" }]);
@@ -71,13 +71,12 @@ function User(props) {
  const [currentUser, setCurrentUser] = useState();
 
  useEffect(() => {
-  if (!filter) {
+  if (userList.length === 0) {
    setBackdrop(true);
    axios
     .get("https://arjunadb.herokuapp.com/user")
     .then((res) => {
      setUserList(res.data);
-     setFilter(false);
      setBackdrop(false);
     })
     .catch((err) => alert(err));
@@ -98,10 +97,18 @@ function User(props) {
         .post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: res.data.webinarid })
         .then((res2) => {
          res.data.pwebinar = res2.data;
+         axios
+          .post("https://arjunadb.herokuapp.com/pwebinar/findinstitute", { instituteid: res.data.institute })
+          .then((res3) => {
+           res.data.pinstitute = res3.data;
+          })
+          .catch((err) => {
+           console.log(err);
+          });
          webinarlist.push(res.data);
          c = c + 1;
          if (c === val.webinars.length) {
-          setWebinarList(webinarlist);
+          setWebinarList2(webinarlist);
           setBackdrop(false);
           setOpen3(true);
          }
@@ -113,7 +120,7 @@ function User(props) {
        c = c + 1;
        if (c === val.webinars.length) {
         if (webinarlist.length !== 0) {
-         setWebinarList(webinarlist);
+         setWebinarList2(webinarlist);
          setOpen3(true);
         }
         setBackdrop(false);
@@ -283,6 +290,25 @@ function User(props) {
      <p style={{ textAlign: "center" }}>
       <button
        className="btn"
+       style={{ color: "green" }}
+       onClick={() => {
+        setBackdrop(true);
+        axios
+         .get("https://arjunadb.herokuapp.com/user")
+         .then((res) => {
+          setUserList(res.data);
+          setBackdrop(false);
+         })
+         .catch((err) => alert(err));
+       }}
+      >
+       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
+        <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
+       </svg>
+      </button>
+      <button
+       className="btn"
        style={{ color: "blue" }}
        onClick={() => {
         if (start === 0) {
@@ -316,6 +342,25 @@ function User(props) {
          fill-rule="evenodd"
          d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"
         />
+       </svg>
+      </button>
+      <button
+       className="btn"
+       style={{ color: "green" }}
+       onClick={() => {
+        setBackdrop(true);
+        axios
+         .get("https://arjunadb.herokuapp.com/user")
+         .then((res) => {
+          setUserList(res.data);
+          setBackdrop(false);
+         })
+         .catch((err) => alert(err));
+       }}
+      >
+       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
        </svg>
       </button>
      </p>
@@ -857,7 +902,7 @@ function User(props) {
          </tr>
         </thead>
         <tbody>
-         {webinarList.map((val, i) => {
+         {webinarList2.map((val, i) => {
           return (
            <tr>
             <th scope="row">{i + 1}</th>
@@ -884,7 +929,7 @@ function User(props) {
       <Button
        onClick={() => {
         setOpen3(false);
-        setFilter(true);
+        setWebinarList(webinarList2);
         history.push("/webinar");
        }}
        color="primary"

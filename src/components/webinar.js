@@ -18,7 +18,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
+import MailIcon from "@material-ui/icons/Mail";
 import {
  EmailShareButton,
  FacebookShareButton,
@@ -35,7 +36,7 @@ import {
 } from "react-share";
 
 import ResponsiveDrawer from "./ui/drawer";
-import { UserList, WebinarList, Filter } from "./context/storage";
+import { UserList, WebinarList } from "./context/storage";
 
 const useStyles = makeStyles((theme) => ({
  root: {
@@ -72,7 +73,7 @@ function Webinar(props) {
  const [pwebinarList, setPwebinarList] = useState([]);
  const [instituteList, setInstituteList] = useState([]);
  const [userList, setUserList] = useContext(UserList);
- const [filter, setFilter] = useContext(Filter);
+ const [userList2, setUserList2] = useState([]);
  const [currentWebinar, setCurrentWebinar] = useState([]);
  const [currentWebinarNo, setCurrentWebinarNo] = useState([]);
  const [webinarName, setWebinarName] = useState("");
@@ -99,7 +100,7 @@ function Webinar(props) {
  const [instituteFields, setInstituteFields] = useState({ name: "", campus: "", location: "", inumber: "", imail: "", pnumber: "", pmail: "", poc: "" });
 
  useEffect(() => {
-  if (!filter) {
+  if (webinarList.length === 0) {
    setBackdrop(true);
    axios
     .get("https://arjunadb.herokuapp.com/webinar")
@@ -128,7 +129,6 @@ function Webinar(props) {
           }
          }
          setWebinarList(res.data);
-         setFilter(false);
          setBackdrop(false);
         })
         .catch((err) => {
@@ -157,7 +157,7 @@ function Webinar(props) {
       c = c + 1;
       if (c === val.users.length) {
        if (userlist.length !== 0) {
-        setUserList(userlist);
+        setUserList2(userlist);
         setOpen3(true);
        }
        setBackdrop(false);
@@ -307,7 +307,15 @@ function Webinar(props) {
               className="btn"
               style={{ color: "blue" }}
               onClick={() => {
-               //  history.push(`/form/${val._id}`);
+               setCurrentWebinar(val);
+               var tempInput = document.createElement("input");
+               tempInput.style = "position: absolute; left: -1000px; top: -1000px";
+               tempInput.value = encodeURI(`https://arjunafe.herokuapp.com/form/${val._id}`);
+               document.body.appendChild(tempInput);
+               tempInput.select();
+               document.execCommand("copy");
+               document.body.removeChild(tempInput);
+
                setOpen7(true);
               }}
              >
@@ -463,6 +471,54 @@ function Webinar(props) {
      <p style={{ textAlign: "center" }}>
       <button
        className="btn"
+       style={{ color: "green" }}
+       onClick={() => {
+        setBackdrop(true);
+        axios
+         .get("https://arjunadb.herokuapp.com/webinar")
+         .then((res) => {
+          axios
+           .get("https://arjunadb.herokuapp.com/pwebinar")
+           .then((res2) => {
+            for (let i = 0; i < res.data.length; i++) {
+             for (let j = 0; j < res2.data.length; j++) {
+              if (res2.data[j]._id === res.data[i].webinarid) {
+               res.data[i].pwebinar = res2.data[j];
+               break;
+              }
+             }
+            }
+
+            axios
+             .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+             .then((res3) => {
+              for (let i = 0; i < res.data.length; i++) {
+               for (let j = 0; j < res3.data.length; j++) {
+                if (res3.data[j]._id === res.data[i].institute) {
+                 res.data[i].pinstitute = res3.data[j];
+                 break;
+                }
+               }
+              }
+              setWebinarList(res.data);
+              setBackdrop(false);
+             })
+             .catch((err) => {
+              console.log(err);
+             });
+           })
+           .catch((err) => alert(err));
+         })
+         .catch((err) => alert(err));
+       }}
+      >
+       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
+        <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
+       </svg>
+      </button>
+      <button
+       className="btn"
        style={{ color: "blue" }}
        onClick={() => {
         if (start === 0) {
@@ -496,6 +552,54 @@ function Webinar(props) {
          fill-rule="evenodd"
          d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"
         />
+       </svg>
+      </button>
+      <button
+       className="btn"
+       style={{ color: "green" }}
+       onClick={() => {
+        setBackdrop(true);
+        axios
+         .get("https://arjunadb.herokuapp.com/webinar")
+         .then((res) => {
+          axios
+           .get("https://arjunadb.herokuapp.com/pwebinar")
+           .then((res2) => {
+            for (let i = 0; i < res.data.length; i++) {
+             for (let j = 0; j < res2.data.length; j++) {
+              if (res2.data[j]._id === res.data[i].webinarid) {
+               res.data[i].pwebinar = res2.data[j];
+               break;
+              }
+             }
+            }
+
+            axios
+             .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+             .then((res3) => {
+              for (let i = 0; i < res.data.length; i++) {
+               for (let j = 0; j < res3.data.length; j++) {
+                if (res3.data[j]._id === res.data[i].institute) {
+                 res.data[i].pinstitute = res3.data[j];
+                 break;
+                }
+               }
+              }
+              setWebinarList(res.data);
+              setBackdrop(false);
+             })
+             .catch((err) => {
+              console.log(err);
+             });
+           })
+           .catch((err) => alert(err));
+         })
+         .catch((err) => alert(err));
+       }}
+      >
+       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
        </svg>
       </button>
      </p>
@@ -800,7 +904,7 @@ function Webinar(props) {
          </tr>
         </thead>
         <tbody>
-         {userList.map((val, i) => {
+         {userList2.map((val, i) => {
           return (
            <tr>
             <th scope="row">{i + 1}</th>
@@ -819,7 +923,7 @@ function Webinar(props) {
                 .post("https://arjunadb.herokuapp.com/webinar/userdelete", { id: val._id, webinarid: currentWebinar._id })
                 .then((res) => {
                  console.log(res);
-                 setUserList((prev) => {
+                 setUserList2((prev) => {
                   return prev.filter((item, k) => k !== i);
                  });
                  setBackdrop(false);
@@ -855,7 +959,7 @@ function Webinar(props) {
       <Button
        onClick={() => {
         setOpen3(false);
-        setFilter(true);
+        setUserList(userList2);
         history.push("/student");
        }}
        color="primary"
@@ -1171,19 +1275,19 @@ function Webinar(props) {
     <Dialog fullScreen={fullScreen} open={open7} onClose={() => {}} aria-labelledby="responsive-dialog-title">
      <DialogTitle id="responsive-dialog-title">{"Share"}</DialogTitle>
      <DialogContent>
-      <EmailShareButton url={"https://arjunafe.herokuapp.com"}>
+      <EmailShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
        <EmailIcon />
       </EmailShareButton>
-      <FacebookShareButton url={"https://arjunafe.herokuapp.com"}>
+      <FacebookShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
        <FacebookIcon />
       </FacebookShareButton>
-      <WhatsappShareButton url={"https://arjunafe.herokuapp.com"}>
-       <WhatsappIcon />
-      </WhatsappShareButton>
-      <TwitterShareButton url={"https://arjunafe.herokuapp.com"}>
+      <TwitterShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
        <TwitterIcon />
       </TwitterShareButton>
-      <TelegramShareButton url={"https://arjunafe.herokuapp.com"}>
+      <WhatsappShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
+       <WhatsappIcon />
+      </WhatsappShareButton>
+      <TelegramShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
        <TelegramIcon />
       </TelegramShareButton>
      </DialogContent>
