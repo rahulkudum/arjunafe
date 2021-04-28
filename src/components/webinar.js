@@ -1186,6 +1186,7 @@ function Webinar(props) {
            dum.push(res.data);
            return dum;
           });
+          setInstituteFields({ name: "", campus: "", location: "", inumber: "", imail: "", pnumber: "", pmail: "", poc: "" });
           setBackdrop(false);
           setOpen5(false);
          })
