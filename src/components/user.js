@@ -68,6 +68,7 @@ function User(props) {
  const [dob, setDob] = useState("");
  const [email, setEmail] = useState("");
  const [gender, setGender] = useState("");
+ const [role, setRole] = useState("");
  const [currentUser, setCurrentUser] = useState();
 
  useEffect(() => {
@@ -191,6 +192,7 @@ function User(props) {
          <th scope="col">Webinars</th>
          <th scope="col">Courses</th>
          <th scope="col">Services</th>
+         <th scope="col">Role</th>
          <th scope="col">Delete</th>
         </tr>
        </thead>
@@ -247,7 +249,14 @@ function User(props) {
               popup(val);
              }}
             >
-             0
+             {val.volunteerwork.length}
+            </td>
+            <td
+             onClick={() => {
+              popup(val);
+             }}
+            >
+             {val.role}
             </td>
             <td>
              <button
@@ -419,6 +428,16 @@ function User(props) {
        }}
        fullWidth
       />
+      <TextField
+       margin="dense"
+       label="Role"
+       type="text"
+       value={role}
+       onChange={(e) => {
+        setRole(e.target.value);
+       }}
+       fullWidth
+      />
      </DialogContent>
      <DialogActions>
       <Button
@@ -446,6 +465,7 @@ function User(props) {
              email: email,
              dob: dob,
              gender: gender,
+             role: role,
             })
             .then((res) => {
              console.log(res);
@@ -459,6 +479,7 @@ function User(props) {
              setEmail("");
              setDob("");
              setGender("");
+             setRole("");
              alert("Successfully created the user");
              setBackdrop(false);
              setOpen(false);

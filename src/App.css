@@ -12,6 +12,13 @@
  position: relative;
 }
 
+.page3 {
+ height: 100vh;
+ width: 100%;
+ position: relative;
+ background-color: #ffefa0;
+}
+
 .form-login {
  width: 100%;
  max-width: 400px;
@@ -27,18 +34,31 @@
 }
 
 .form-signin {
- width: 100%;
- max-width: 400px;
- padding: 15px;
+ width: 75%;
+ max-width: 600px;
+
  margin: auto;
  position: absolute;
- top: 45%;
+ top: 55%;
  left: 50%;
  transform: translate(-50%, -50%);
  text-align: center;
- background: linear-gradient(to bottom, rgba(146, 135, 187, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
- transition: opacity 0.1s, transform 0.3s cubic-bezier(0.17, -0.65, 0.665, 1.25);
+ /* background: linear-gradient(to bottom, rgba(146, 135, 187, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
+ transition: opacity 0.1s, transform 0.3s cubic-bezier(0.17, -0.65, 0.665, 1.25); */
  /* transform: scale(1); */
+}
+
+.div-signin {
+ width: 85%;
+ max-width: 700px;
+ font-size: 20px;
+
+ margin: auto;
+ position: absolute;
+ top: 30%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ text-align: center;
 }
 
 .query {
@@ -74,29 +94,29 @@
 }
 .form-signin .form-control:focus {
  z-index: 2;
- background: transparent;
+ /* background: transparent;
  border: none;
  border-bottom: 1px solid white;
  outline: none;
  box-shadow: none;
  color: white;
- border-radius: 0;
+ border-radius: 0; */
 }
 .form-signin .name {
- margin-bottom: 10px;
+ margin-bottom: 0px;
  margin-left: 0px;
- background: transparent;
+ background-color: white;
+ /* background: transparent;
  border: none;
  border-bottom: 1px solid white;
  outline: none;
  box-shadow: none;
- color: white;
+ color: white;*/
  border-radius: 0;
 }
 
 .form-signin .name::placeholder {
- color: white;
- opacity: 1;
+ color: #c8c2bc;
 }
 
 .dname {
@@ -112,6 +132,23 @@
  right: 10px;
  top: -10px;
  height: 50px;
+}
+
+.btn-form {
+ background-color: red;
+ color: #ffefa0;
+ width: 50%;
+ height: 70px;
+ font-size: 40px;
+ position: absolute;
+ top: 90%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ border: 10px solid black;
+ text-align: center;
+ display: flex;
+ justify-content: center;
+ align-items: center;
 }
 
 .thankyou {

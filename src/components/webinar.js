@@ -20,6 +20,8 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import MailIcon from "@material-ui/icons/Mail";
+import { WidgetLoader, Widget } from "react-cloudinary-upload-widget";
+import { Image } from "cloudinary-react";
 import {
  EmailShareButton,
  FacebookShareButton,
@@ -85,6 +87,7 @@ function Webinar(props) {
  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
  const [guest, setGuest] = useState("");
  const [instituteId, setInstituteId] = useState("");
+ const [image, setImage] = useState("");
  const [start, setStart] = useState(0);
  const [open, setOpen] = useState(false);
  const [open1, setOpen1] = useState(false);
@@ -98,15 +101,16 @@ function Webinar(props) {
  const [search, setSearch] = useState([{ property: "name", operator: "=", value: "" }]);
  const [search2, setSearch2] = useState([{ property: "name", operator: "=", value: "" }]);
  const [instituteFields, setInstituteFields] = useState({ name: "", campus: "", location: "", inumber: "", imail: "", pnumber: "", pmail: "", poc: "" });
+ const [method, setMethod] = useState("1");
 
  useEffect(() => {
   if (webinarList.length === 0) {
    setBackdrop(true);
    axios
-    .get("https://arjunadb.herokuapp.com/webinar")
+    .get("http://localhost:5000/webinar")
     .then((res) => {
      axios
-      .get("https://arjunadb.herokuapp.com/pwebinar")
+      .get("http://localhost:5000/pwebinar")
       .then((res2) => {
        for (let i = 0; i < res.data.length; i++) {
         for (let j = 0; j < res2.data.length; j++) {
@@ -118,7 +122,7 @@ function Webinar(props) {
        }
 
        axios
-        .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+        .get("http://localhost:5000/pwebinar/institutes")
         .then((res3) => {
          for (let i = 0; i < res.data.length; i++) {
           for (let j = 0; j < res3.data.length; j++) {
@@ -129,6 +133,7 @@ function Webinar(props) {
           }
          }
          setWebinarList(res.data);
+
          setBackdrop(false);
         })
         .catch((err) => {
@@ -149,7 +154,7 @@ function Webinar(props) {
    setBackdrop(true);
    val.users.map((val2, j) => {
     axios
-     .post("https://arjunadb.herokuapp.com/user/findbyid", { id: val2 })
+     .post("http://localhost:5000/user/findbyid", { id: val2 })
      .then((res) => {
       if (res.data !== null) {
        userlist.push(res.data);
@@ -180,6 +185,42 @@ function Webinar(props) {
     <main className={classes.content}>
      <div className={classes.toolbar} />
      <div className={classes.root2}>
+      <WidgetLoader />
+      {method === "2" ? (
+       <Widget
+        sources={["local", "url", "image_search", "camera", "google_drive", "dropbox", "facebook", "instagram", "shutterstock"]}
+        //AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc
+        sourceKeys={{ googleApiKey: "AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc" }}
+        resourceType={"image"} // optionally set with 'auto', 'image', 'video' or 'raw' -> default = 'auto'
+        cloudName="arjunadb"
+        uploadPreset="arjunadb"
+        buttonText="Upload Poster"
+        style={{
+         color: "white",
+         border: "none",
+         width: "120px",
+         backgroundColor: "green",
+         borderRadius: "4px",
+         height: "30px",
+        }}
+        folder={"webinar_posters"}
+        cropping={true}
+        onSuccess={(res) => {
+         console.log(res);
+         if (method === "1") setImage(res.info.path);
+        }}
+        onFailure={(err) => {
+         console.log(err);
+        }}
+        logging={true}
+        // customPublicId={"sample1"} // set a specific custom public_id.
+        // use_filename={true} // tell Cloudinary to use the original name of the uploaded
+
+        //  // To use the file name as the public_id use 'use_filename={true}' parameter
+        //  eager={"w_400,h_300,c_pad|w_260,h_200,c_crop"} // add eager transformations -> deafult = null
+       />
+      ) : null}
+
       <Grid container spacing={3}>
        <Grid item xs={4}>
         <button
@@ -187,12 +228,12 @@ function Webinar(props) {
          onClick={() => {
           setBackdrop(true);
           axios
-           .get("https://arjunadb.herokuapp.com/pwebinar")
+           .get("http://localhost:5000/pwebinar")
            .then((res) => {
             setPwebinarList(res.data);
             setWebinarId(res.data[0]._id);
             axios
-             .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+             .get("http://localhost:5000/pwebinar/institutes")
              .then((resp) => {
               setInstituteList(resp.data);
               setInstituteId("");
@@ -213,6 +254,25 @@ function Webinar(props) {
         <button
          onClick={() => {
           // setOpen2(true);
+          //MXRAKj8sunVnDXiRlblyyLhLlz9K2PTNreDRlIzN4NcZmImO3iWQ9AzJLs4p
+          // axios
+          //  .post(
+          //   "https://api.tinyurl.com/create",
+          //   {
+          //    url: "https://arjunafe.herokuapp.com/form/608910c40c816b0004ed1bb7",
+          //    domain: "tinyurl.com",
+          //    alias: "",
+          //   },
+          //   {
+          //    headers: { Authorization: "Bearer MXRAKj8sunVnDXiRlblyyLhLlz9K2PTNreDRlIzN4NcZmImO3iWQ9AzJLs4p", "Content-Type": "application/json" },
+          //   }
+          //  )
+          //  .then((res) => {
+          //   console.log(res);
+          //  })
+          //  .catch((err) => {
+          //   console.log(err);
+          //  });
          }}
          className="w-100 btn btn-lg btn-success"
         >
@@ -310,7 +370,7 @@ function Webinar(props) {
                setCurrentWebinar(val);
                var tempInput = document.createElement("input");
                tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-               tempInput.value = encodeURI(`https://arjunafe.herokuapp.com/form/${val._id}`);
+               tempInput.value = encodeURI(`https://tinyurl.com/arjuna${val.date.slice(-2)}${val._id.slice(-2)}`);
                document.body.appendChild(tempInput);
                tempInput.select();
                document.execCommand("copy");
@@ -333,7 +393,7 @@ function Webinar(props) {
 
                async function getAllUrls(urls) {
                 try {
-                 var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/findbyid", url).then((res) => res.data)));
+                 var datas = await Promise.all(urls.map((url) => axios.post("http://localhost:5000/user/findbyid", url).then((res) => res.data)));
                  const excelArray = datas
                   .filter((data) => data)
                   .map((data, i) => {
@@ -439,9 +499,10 @@ function Webinar(props) {
               onClick={() => {
                setBackdrop(true);
                axios
-                .post("https://arjunadb.herokuapp.com/webinar/delete", { id: val._id })
+                .post("http://localhost:5000/webinar/delete", { id: val._id })
                 .then((res) => {
                  console.log(res);
+
                  setWebinarList((prev) => {
                   return prev.filter((item, k) => k !== i);
                  });
@@ -475,10 +536,10 @@ function Webinar(props) {
        onClick={() => {
         setBackdrop(true);
         axios
-         .get("https://arjunadb.herokuapp.com/webinar")
+         .get("http://localhost:5000/webinar")
          .then((res) => {
           axios
-           .get("https://arjunadb.herokuapp.com/pwebinar")
+           .get("http://localhost:5000/pwebinar")
            .then((res2) => {
             for (let i = 0; i < res.data.length; i++) {
              for (let j = 0; j < res2.data.length; j++) {
@@ -490,7 +551,7 @@ function Webinar(props) {
             }
 
             axios
-             .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+             .get("http://localhost:5000/pwebinar/institutes")
              .then((res3) => {
               for (let i = 0; i < res.data.length; i++) {
                for (let j = 0; j < res3.data.length; j++) {
@@ -501,6 +562,7 @@ function Webinar(props) {
                }
               }
               setWebinarList(res.data);
+
               setBackdrop(false);
              })
              .catch((err) => {
@@ -560,10 +622,10 @@ function Webinar(props) {
        onClick={() => {
         setBackdrop(true);
         axios
-         .get("https://arjunadb.herokuapp.com/webinar")
+         .get("http://localhost:5000/webinar")
          .then((res) => {
           axios
-           .get("https://arjunadb.herokuapp.com/pwebinar")
+           .get("http://localhost:5000/pwebinar")
            .then((res2) => {
             for (let i = 0; i < res.data.length; i++) {
              for (let j = 0; j < res2.data.length; j++) {
@@ -575,7 +637,7 @@ function Webinar(props) {
             }
 
             axios
-             .get("https://arjunadb.herokuapp.com/pwebinar/institutes")
+             .get("http://localhost:5000/pwebinar/institutes")
              .then((res3) => {
               for (let i = 0; i < res.data.length; i++) {
                for (let j = 0; j < res3.data.length; j++) {
@@ -586,6 +648,7 @@ function Webinar(props) {
                }
               }
               setWebinarList(res.data);
+
               setBackdrop(false);
              })
              .catch((err) => {
@@ -608,8 +671,18 @@ function Webinar(props) {
     <Dialog fullScreen={fullScreen} open={open} onClose={() => {}} aria-labelledby="responsive-dialog-title">
      <DialogTitle id="responsive-dialog-title">{"New Webinar"}</DialogTitle>
      <DialogContent>
+      <TextField
+       margin="dense"
+       type="text"
+       value={method}
+       onChange={(e) => {
+        setMethod(e.target.value);
+       }}
+       fullWidth
+      />
       <FormControl className={classes.formControl}>
        <InputLabel>Webinar Name</InputLabel>
+
        <Select
         native
         value={webinarId}
@@ -685,43 +758,125 @@ function Webinar(props) {
         }}
        />
       </form>
+      <br />
+
+      {method === "1" ? (
+       <>
+        <Widget
+         sources={["local", "url", "image_search", "camera", "google_drive", "dropbox", "facebook", "instagram", "shutterstock"]}
+         //AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc
+         sourceKeys={{ googleApiKey: "AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc" }}
+         resourceType={"image"} // optionally set with 'auto', 'image', 'video' or 'raw' -> default = 'auto'
+         cloudName="arjunadb"
+         uploadPreset="arjunadb"
+         buttonText="Upload Poster"
+         style={{
+          color: "white",
+          border: "none",
+          width: "150px",
+          backgroundColor: "green",
+          borderRadius: "4px",
+          height: "30px",
+         }}
+         folder={"webinar_posters"}
+         cropping={true}
+         onSuccess={(res) => {
+          console.log(res);
+          if (method === "1") setImage(res.info.path);
+         }}
+         onFailure={(err) => {
+          console.log(err);
+         }}
+         logging={true}
+         customPublicId={"sample1"} // set a specific custom public_id.
+         // use_filename={true} // tell Cloudinary to use the original name of the uploaded
+
+         //  // To use the file name as the public_id use 'use_filename={true}' parameter
+         //  eager={"w_400,h_300,c_pad|w_260,h_200,c_crop"} // add eager transformations -> deafult = null
+        />
+        <p>{image ? "Poster is uploaded" : ""}</p>
+       </>
+      ) : null}
      </DialogContent>
      <DialogActions>
       <Button
        onClick={() => {
         setOpen(false);
+        setMethod("1");
        }}
        color="primary"
       >
        Cancel
       </Button>
       <Button
+       style={{ border: "0px", padding: "0px" }}
        onClick={() => {
         setBackdrop(true);
         axios
-         .post("https://arjunadb.herokuapp.com/webinar/add", {
-          webinarid: webinarId,
-          speaker: speakerName,
-          date: date,
-          guest: guest,
-          institute: instituteId,
-         })
+         .post(
+          "http://localhost:5000/webinar/add",
+          method === "1"
+           ? {
+              webinarid: webinarId,
+              speaker: speakerName,
+              date: date,
+              guest: guest,
+              institute: instituteId,
+              image: image,
+             }
+           : {
+              webinarid: webinarId,
+              speaker: speakerName,
+              date: date,
+              guest: guest,
+              institute: instituteId,
+             }
+         )
          .then((res) => {
-          axios.post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: webinarId }).then((res2) => {
-           axios.post("https://arjunadb.herokuapp.com/pwebinar/findinstitute", { instituteid: instituteId }).then((res3) => {
-            res.data.pwebinar = res2.data;
-            if (instituteId !== "") {
-             res.data.pinstitute = res3.data;
-            }
-            setWebinarList((prev) => {
-             let dummy = [...prev];
-             dummy.push(res.data);
-             return dummy;
-            });
-            setSpeakerName("");
-            setGuest("");
-            setBackdrop(false);
-            setOpen(false);
+          axios.post("http://localhost:5000/pwebinar/find", { webinarid: webinarId }).then((res2) => {
+           axios.post("http://localhost:5000/pwebinar/findinstitute", { instituteid: instituteId }).then((res3) => {
+            axios
+             .post(
+              "https://api.tinyurl.com/create",
+              {
+               url: `https://arjunafe.herokuapp.com/form/${res.data._id}`,
+               domain: "tinyurl.com",
+               alias: `arjuna${date.slice(-2)}${res.data._id.slice(-2)}`,
+              },
+              {
+               headers: { Authorization: "Bearer MXRAKj8sunVnDXiRlblyyLhLlz9K2PTNreDRlIzN4NcZmImO3iWQ9AzJLs4p", "Content-Type": "application/json" },
+              }
+             )
+             .then((res4) => {
+              if (method === "2") {
+               document.getElementById("cloudinary_upload_button").click();
+               window.prompt(
+                "Copy the below id and then a Widget will appear click on Avanced button on the bottom and paste the id in the publicId",
+                res.data._id
+               );
+              }
+              console.log(res);
+              console.log(res4);
+              res.data.pwebinar = res2.data;
+              if (instituteId !== "") {
+               res.data.pinstitute = res3.data;
+              }
+
+              setWebinarList((prev) => {
+               let dummy = [...prev];
+               dummy.push(res.data);
+               return dummy;
+              });
+
+              setSpeakerName("");
+              setGuest("");
+              setImage("");
+              setBackdrop(false);
+              setOpen(false);
+             })
+             .catch((err) => {
+              console.log(err);
+             });
            });
           });
          })
@@ -873,7 +1028,7 @@ function Webinar(props) {
         query += "}";
 
         axios
-         .post("https://arjunadb.herokuapp.com/user/search", { query: JSON.parse(query) })
+         .post("http://localhost:5000/user/search", { query: JSON.parse(query) })
          .then((res) => {
           console.log(res.data);
           if (res.data.length === 0) alert("No users found");
@@ -922,7 +1077,7 @@ function Webinar(props) {
               onClick={() => {
                setBackdrop(true);
                axios
-                .post("https://arjunadb.herokuapp.com/webinar/userdelete", { id: val._id, webinarid: currentWebinar._id })
+                .post("http://localhost:5000/webinar/userdelete", { id: val._id, webinarid: currentWebinar._id })
                 .then((res) => {
                  console.log(res);
                  setUserList2((prev) => {
@@ -1019,7 +1174,7 @@ function Webinar(props) {
        onClick={() => {
         setBackdrop(true);
         axios
-         .post("https://arjunadb.herokuapp.com/pwebinar/add", {
+         .post("http://localhost:5000/pwebinar/add", {
           name: webinarPname,
           description: webinarDescription,
           level: webinarLevel,
@@ -1172,7 +1327,7 @@ function Webinar(props) {
        onClick={() => {
         setBackdrop(true);
         axios
-         .post("https://arjunadb.herokuapp.com/pwebinar/addinstitute", {
+         .post("http://localhost:5000/pwebinar/addinstitute", {
           name: instituteFields.name,
           campus: instituteFields.campus,
           location: instituteFields.location,
@@ -1233,7 +1388,7 @@ function Webinar(props) {
          console.log(currentWebinar._id, currentWebinar.webinarid);
 
          axios
-          .post("https://arjunadb.herokuapp.com/webinar/addusers", {
+          .post("http://localhost:5000/webinar/addusers", {
            id: currentWebinar._id,
            wid: currentWebinar.webinarid,
            eid: currentWebinar.institute,
@@ -1241,7 +1396,7 @@ function Webinar(props) {
           })
           .then(() => {
            axios
-            .post("https://arjunadb.herokuapp.com/webinar/find", { webinarid: currentWebinar._id })
+            .post("http://localhost:5000/webinar/find", { webinarid: currentWebinar._id })
             .then((res) => {
              let webinarlist = webinarList;
              webinarlist[currentWebinarNo].users = res.data.users;
@@ -1278,21 +1433,34 @@ function Webinar(props) {
     <Dialog fullScreen={fullScreen} open={open7} onClose={() => {}} aria-labelledby="responsive-dialog-title">
      <DialogTitle id="responsive-dialog-title">{"Share"}</DialogTitle>
      <DialogContent>
-      <EmailShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
-       <EmailIcon />
-      </EmailShareButton>
-      <FacebookShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
-       <FacebookIcon />
-      </FacebookShareButton>
-      <TwitterShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
-       <TwitterIcon />
-      </TwitterShareButton>
-      <WhatsappShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
-       <WhatsappIcon />
-      </WhatsappShareButton>
-      <TelegramShareButton url={`https://arjunafe.herokuapp.com/form/${currentWebinar._id}`}>
-       <TelegramIcon />
-      </TelegramShareButton>
+      {currentWebinar.date ? (
+       <>
+        <div style={{ textAlign: "center" }}>
+         <EmailShareButton url={`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}>
+          <EmailIcon />
+         </EmailShareButton>
+         <FacebookShareButton url={`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}>
+          <FacebookIcon />
+         </FacebookShareButton>
+         <TwitterShareButton url={`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}>
+          <TwitterIcon />
+         </TwitterShareButton>
+         <LinkedinShareButton url={`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}>
+          <LinkedinIcon />
+         </LinkedinShareButton>
+         <WhatsappShareButton url={`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}>
+          <WhatsappIcon />
+         </WhatsappShareButton>
+         <TelegramShareButton url={`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}>
+          <TelegramIcon />
+         </TelegramShareButton>
+        </div>
+
+        <br />
+        <p>Shortened link: {`https://tinyurl.com/arjuna${currentWebinar.date.slice(-2)}${currentWebinar._id.slice(-2)}`}</p>
+        <p>Orginal link: http://localhost:3000/form/{currentWebinar._id}</p>
+       </>
+      ) : null}
      </DialogContent>
      <DialogActions>
       <Button
