@@ -19,6 +19,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 import ResponsiveDrawer from "./ui/drawer";
 import { UserList, WebinarList, Filter } from "./context/storage";
+import ScriptTag from "react-script-tag";
+import { Cloudinary } from "cloudinary-core";
 
 const useStyles = makeStyles((theme) => ({
  root: {
@@ -64,12 +66,42 @@ function Institute() {
    });
  }, []);
 
+ useEffect(() => {
+  console.log("changed");
+  if (window.action === "closed") {
+   console.log("working");
+  }
+ }, [window.action]);
+
  function popup(val) {
   console.log(val);
  }
 
  return (
   <>
+   {/* <ScriptTag type="text/javascript" src="https://upload-widget.cloudinary.com/global/all.js" />
+   <ScriptTag type="text/javascript">
+      var myWidget = cloudinary.createUploadWidget(
+    {
+     cloudName: "my_cloud_name",
+     uploadPreset: "my_preset",
+    },
+    (error, result) => {
+     if (!error && result && result.event === "success") {
+      console.log("Done! Here is the image info: ", result.info);
+     }
+    }
+   );
+
+   document.getElementById("upload_widget").addEventListener(
+    "click",
+    function () {
+     myWidget.open();
+    },
+    false
+   );
+   </ScriptTag> */}
+
    <Backdrop className={classes.backdrop} open={backdrop}>
     <CircularProgress color="inherit" />
    </Backdrop>

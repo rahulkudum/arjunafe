@@ -69,6 +69,8 @@ function Form() {
       ) : (
        <Grid item style={{ textAlign: "center", margin: "auto", padding: "0" }} item xs={12} xl={6} lg={6} md={6} sm={12}>
         <Image style={{ width: "100%", height: "100vh" }} cloudName="arjunadb" publicId={`webinar_posters/${webinarId}`} />
+        {/* <img src="https://www.dropbox.com/recents?_tk=web_left_nav_bar&preview=WhatsApp+Image+2021-05-16+at+20.37.49.jpeg" /> */}
+        {/* <iframe src="https://drive.google.com/file/d/10FmBmjJnxQIPZEgi-L96RqY2_Yq0rVFR/preview" width="640" height="480"></iframe> */}
        </Grid>
       )}
       <Grid item xs={12} xl={6} lg={6} md={6} sm={12} style={{ margin: "0", padding: "0" }}>
@@ -159,7 +161,7 @@ function Form() {
           className="needs-validation 2"
           onSubmit={(e) => {
            e.preventDefault();
-           alert("done");
+
            //  if (newStudent === "new") {
            //   axios
            //    .post("https://arjunadb.herokuapp.com/user/add", {
@@ -192,6 +194,8 @@ function Form() {
 
            //    .catch((err) => console.log(err));
            //  }
+
+           setDone(true);
           }}
          >
           <div className="div-signin">
