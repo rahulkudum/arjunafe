@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   minWidth: 120,
  },
  backdrop: {
-  zIndex: theme.zIndex.drawer + 1,
+  zIndex: 100000,
   color: "#fff",
  },
 }));
@@ -735,80 +735,90 @@ function Webinar(props) {
           institute: instituteId,
          })
          .then((res) => {
-          axios.post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: webinarId }).then((res2) => {
-           axios.post("https://arjunadb.herokuapp.com/pwebinar/findinstitute", { instituteid: instituteId }).then((res3) => {
-            axios
-             .post(
-              "https://api.tinyurl.com/create",
-              {
-               url: `https://arjunafe.herokuapp.com/form/${res.data._id}`,
-               domain: "tinyurl.com",
-               alias: `arjuna${date.slice(-2)}${res.data._id.slice(-2)}`,
-              },
-              {
-               headers: { Authorization: "Bearer MXRAKj8sunVnDXiRlblyyLhLlz9K2PTNreDRlIzN4NcZmImO3iWQ9AzJLs4p", "Content-Type": "application/json" },
-              }
-             )
-             .then((res4) => {
-              let uploaded = false;
-              window.cloudinary.openUploadWidget(
-               {
-                cloudName: "arjunadb",
-                uploadPreset: "arjunadb",
-                sources: ["local", "url", "image_search", "camera", "google_drive", "dropbox", "facebook", "instagram", "shutterstock"],
-                multiple: false,
-                cropping: true,
-                croppingShowDimensions: true,
-                croppingCoordinatesMode: "custom",
-                googleApiKey: "AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc",
-                publicId: res.data._id,
-                folder: "webinar_posters",
-               },
-               (error, result) => {
-                console.log(result);
-                if (result.event === "success") {
-                 uploaded = true;
-                }
-                if (result.info === "hidden" && !uploaded) {
-                 setBackdrop(true);
-
+          let uploaded = false;
+          window.cloudinary.openUploadWidget(
+           {
+            cloudName: "arjunadb",
+            uploadPreset: "arjunadb",
+            sources: ["local", "url", "image_search", "camera", "google_drive", "dropbox", "facebook", "instagram", "shutterstock"],
+            multiple: false,
+            cropping: true,
+            croppingShowDimensions: true,
+            croppingCoordinatesMode: "custom",
+            googleApiKey: "AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc",
+            publicId: res.data._id,
+            folder: "webinar_posters",
+           },
+           (error, result) => {
+            console.log(result);
+            if (result.event === "success") {
+             uploaded = true;
+             axios
+              .post("https://arjunadb.herokuapp.com/pwebinar/find", { webinarid: webinarId })
+              .then((res2) => {
+               axios
+                .post("https://arjunadb.herokuapp.com/pwebinar/findinstitute", { instituteid: instituteId })
+                .then((res3) => {
                  axios
-                  .post("https://arjunadb.herokuapp.com/webinar/delete", { id: res.data._id })
-                  .then((res5) => {
-                   console.log(res5);
+                  .post(
+                   "https://api.tinyurl.com/create",
+                   {
+                    url: `https://arjunafe.herokuapp.com/form/${res.data._id}`,
+                    domain: "tinyurl.com",
+                    alias: `arjuna${date.slice(-2)}${res.data._id.slice(-2)}`,
+                   },
+                   {
+                    headers: {
+                     Authorization: "Bearer MXRAKj8sunVnDXiRlblyyLhLlz9K2PTNreDRlIzN4NcZmImO3iWQ9AzJLs4p",
+                     "Content-Type": "application/json",
+                    },
+                   }
+                  )
+                  .then((res4) => {
+                   res.data.pwebinar = res2.data;
+                   if (instituteId !== "") {
+                    res.data.pinstitute = res3.data;
+                   }
 
                    setWebinarList((prev) => {
-                    return prev.filter((item, k) => item._id !== res.data._id);
+                    let dummy = [...prev];
+                    dummy.push(res.data);
+                    return dummy;
                    });
+
+                   setSpeakerName("");
+                   setGuest("");
+                   setImage("");
                    setBackdrop(false);
-                   alert("Webinar creation is failed as no poster is uploaded");
+                   setOpen(false);
+                   alert("Webinar is successfully created");
                   })
-                  .catch((err) => console.log(err));
-                }
-               }
-              );
-              res.data.pwebinar = res2.data;
-              if (instituteId !== "") {
-               res.data.pinstitute = res3.data;
-              }
-
-              setWebinarList((prev) => {
-               let dummy = [...prev];
-               dummy.push(res.data);
-               return dummy;
+                  .catch((err) => {
+                   console.log(err);
+                  });
+                })
+                .catch((err) => {
+                 console.log(err);
+                });
+              })
+              .catch((err) => {
+               console.log(err);
               });
+            }
+            if (result.info === "hidden" && !uploaded) {
+             setBackdrop(true);
 
-              setSpeakerName("");
-              setGuest("");
-              setImage("");
-              setBackdrop(false);
-              setOpen(false);
-             })
-             .catch((err) => {
-              console.log(err);
-             });
-           });
-          });
+             axios
+              .post("https://arjunadb.herokuapp.com/webinar/delete", { id: res.data._id })
+              .then((res5) => {
+               console.log(res5);
+               setBackdrop(false);
+               alert("Webinar creation is failed as no poster is uploaded");
+              })
+              .catch((err) => console.log(err));
+            }
+           }
+          );
          })
          .catch((err) => console.log(err));
        }}
