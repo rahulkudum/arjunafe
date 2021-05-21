@@ -3,7 +3,6 @@ import { Route, Switch, useHistory, Redirect } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "react-google-login";
 
-import "./App.css";
 import Webinar from "./components/webinar";
 
 import User from "./components/user";

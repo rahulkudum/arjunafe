@@ -3,17 +3,51 @@ import React, { useContext, useEffect, useState } from "react";
 import { Switch, Route, useHistory, useParams, useRouteMatch } from "react-router-dom";
 import axios from "axios";
 import Grid from "@material-ui/core/Grid";
-import logo from "../logo.png";
+
 import { makeStyles } from "@material-ui/core/styles";
-import { Image } from "cloudinary-react";
+
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import { Facebook, LinkedIn, Mail, Telegram, Twitter, WhatsApp, YouTube } from "@material-ui/icons";
+import { Button } from "@material-ui/core";
+
+import Accordion from "@material-ui/core/Accordion";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import Menu from "@material-ui/icons/Menu";
+import { ListItem, ListItemIcon } from "@material-ui/core";
+import { List } from "@material-ui/core";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
  root: {
   flexGrow: 1,
  },
+ root2: {
+  width: "100%",
+  zIndex: 3,
+ },
+ heading: {
+  fontSize: theme.typography.pxToRem(15),
+  flexBasis: "33.33%",
+  flexShrink: 0,
+ },
+ secondaryHeading: {
+  fontSize: theme.typography.pxToRem(15),
+  color: theme.palette.text.secondary,
+ },
 }));
 
-function Form() {
+const breakPoints = [
+ { width: 1, itemsToShow: 1 },
+ { width: 550, itemsToShow: 2, itemsToScroll: 2 },
+ { width: 768, itemsToShow: 3 },
+ { width: 1200, itemsToShow: 4 },
+];
+
+function Form(props) {
  const classes = useStyles();
  let history = useHistory();
  let { path, url } = useRouteMatch();
@@ -27,8 +61,32 @@ function Form() {
  const [gender, setGender] = useState("");
  const [role, setRole] = useState("");
  const [newStudent, setNewStudent] = useState("");
- const [done, setDone] = useState(false);
+ const [done, setDone] = useState(true);
  const [id, setId] = useState("");
+ const [deviceType, setDeviceType] = useState("mobile");
+ const [part, setPart] = useState({ email: "", gender: "", role: "", dob: "" });
+ const [menu, setMenu] = useState(false);
+
+ const responsive = {
+  desktop: {
+   breakpoint: { max: 3000, min: 1024 },
+   items: 5,
+   slidesToSlide: 4, // optional, default to 1.
+   partialVisibilityGutter: 40,
+  },
+  tablet: {
+   breakpoint: { max: 1024, min: 600 },
+   items: 2,
+   slidesToSlide: 2, // optional, default to 1.
+   partialVisibilityGutter: 30,
+  },
+  mobile: {
+   breakpoint: { max: 600, min: 0 },
+   items: 1,
+   slidesToSlide: 1, // optional, default to 1.
+   partialVisibilityGutter: 30,
+  },
+ };
 
  useEffect(() => {
   axios
@@ -56,23 +114,32 @@ function Form() {
     false
    );
   });
+
+  if (window.screen.width >= 1024) {
+   setDeviceType("desktop");
+  } else if (window.screen.width >= 600) {
+   setDeviceType("tablet");
+  }
  }, []);
+
+ useEffect(() => {
+  if (done) {
+   var vid = document.getElementById("myVideo");
+   if (vid) {
+    vid.autoplay = true;
+    vid.load();
+   }
+  }
+ }, [done]);
  return (
   <Switch>
    <Route exact path={path}>
     {!done ? (
      <Grid container>
-      {webinar.image ? (
-       <Grid item style={{ textAlign: "center", margin: "auto", padding: "0" }} item xs={12} xl={6} lg={6} md={6} sm={12}>
-        <img style={{ width: "100%", height: "100vh" }} src={`https://res.cloudinary.com/arjunadb/image/upload/${webinar.image}`} />
-       </Grid>
-      ) : (
-       <Grid item style={{ textAlign: "center", margin: "auto", padding: "0" }} item xs={12} xl={6} lg={6} md={6} sm={12}>
-        <Image style={{ width: "100%", height: "100vh" }} cloudName="arjunadb" publicId={`webinar_posters/${webinarId}`} />
-        {/* <img src="https://www.dropbox.com/recents?_tk=web_left_nav_bar&preview=WhatsApp+Image+2021-05-16+at+20.37.49.jpeg" /> */}
-        {/* <iframe src="https://drive.google.com/file/d/10FmBmjJnxQIPZEgi-L96RqY2_Yq0rVFR/preview" width="640" height="480"></iframe> */}
-       </Grid>
-      )}
+      <Grid item style={{ textAlign: "center", margin: "auto", padding: "0" }} item xs={12} xl={6} lg={6} md={6} sm={12}>
+       <img className="poster" src={`https://res.cloudinary.com/arjunadb/image/upload/webinar_posters/${webinarId}`} />
+      </Grid>
+
       <Grid item xs={12} xl={6} lg={6} md={6} sm={12} style={{ margin: "0", padding: "0" }}>
        <div className="page3">
         <div
@@ -95,29 +162,36 @@ function Form() {
           onSubmit={(e) => {
            e.preventDefault();
 
-           //  axios
-           //   .post("https://arjunadb.herokuapp.com/user/find", { number: Number(number) })
-           //   .then((res) => {
-           //    if (res.data) {
-           //     if (res.data.email === "" || res.data.dob === "") {
-           //      setId(res.data._id);
-           //      setNewStudent("part");
-           //     } else {
-           //      axios
-           //       .post("https://arjunadb.herokuapp.com/user/webinaradd", {
-           //        id: res.data._id,
-           //        webinarid: webinar._id,
-           //       })
-           //       .then((res) => {
-           //        if (!res.data) alert("You have already registered for this webinar");
-           //        setDone(true);
-           //       })
-           //       .catch((err) => console.log(err));
-           //     }
-           //    } else setNewStudent("new");
-           //   })
-           //   .catch((err) => console.log(err));
-           setNewStudent("new");
+           axios
+            .post("https://arjunadb.herokuapp.com/user/find", { number: Number(number) })
+            .then((res) => {
+             if (res.data) {
+              axios
+               .post("https://arjunadb.herokuapp.com/user/webinaradd", {
+                id: res.data._id,
+                webinarid: webinar._id,
+               })
+               .then((res) => {
+                if (!res.data) alert("You have already registered for this webinar");
+                if (res.data.email === "" || res.data.dob === "" || res.data.role === "" || res.data.gender === "") {
+                 setId(res.data._id);
+                 setEmail(res.data.email);
+                 setDob(res.data.dob);
+                 setGender(res.data.gender);
+                 setRole(res.data.role);
+                 part.email = res.data.email;
+                 part.gender = res.data.gender;
+                 part.role = res.data.role;
+                 part.dob = res.data.dob;
+                 setNewStudent("part");
+                } else {
+                 setDone(true);
+                }
+               })
+               .catch((err) => console.log(err));
+             } else setNewStudent("new");
+            })
+            .catch((err) => console.log(err));
           }}
          >
           <div className="div-signin">
@@ -162,99 +236,119 @@ function Form() {
           onSubmit={(e) => {
            e.preventDefault();
 
-           //  if (newStudent === "new") {
-           //   axios
-           //    .post("https://arjunadb.herokuapp.com/user/add", {
-           //     name: name,
-           //     number: number,
-           //     email: email,
-           //     dob: dob,
-           //     gender: gender,
-           //     role:role,
-           //     webinarid: webinar._id,
-           //    })
-           //    .then((res) => {
-           //     console.log(res.data);
-           //     setDone(true);
-           //    })
+           if (newStudent === "new") {
+            axios
+             .post("https://arjunadb.herokuapp.com/user/add", {
+              name: name,
+              number: number,
+              email: email,
+              dob: dob,
+              gender: gender,
+              role: role,
+              webinarid: webinar._id,
+             })
+             .then((res) => {
+              console.log(res.data);
+              setDone(true);
+             })
 
-           //    .catch((err) => console.log(err));
-           //  } else if (newStudent === "part") {
-           //   axios
-           //    .post("https://arjunadb.herokuapp.com/user/updateadd", {
-           //     id: id,
-           //     email: email,
-           //     dob: dob,
-           //     webinarid: webinar._id,
-           //    })
-           //    .then((res) => {
-           //     console.log(res.data);
-           //     setDone(true);
-           //    })
+             .catch((err) => console.log(err));
+           } else if (newStudent === "part") {
+            axios
+             .post("https://arjunadb.herokuapp.com/user/updateadd", {
+              id: id,
+              email: email,
+              dob: dob,
+              gender: gender,
+              role: role,
+              webinarid: webinar._id,
+             })
+             .then((res) => {
+              console.log(res.data);
+              setDone(true);
+             })
 
-           //    .catch((err) => console.log(err));
-           //  }
-
-           setDone(true);
+             .catch((err) => console.log(err));
+           }
           }}
          >
           <div className="div-signin">
-           <p>Looks like this is your first ARJUNA webinar!</p>
+           {newStudent === "new" ? <p>Looks like this is your first ARJUNA webinar!</p> : <p>Looks like some of your details are missing</p>}
            <p>By filling out the below details, you can receive updates about our events</p>
           </div>
           <main className="form-signin">
-           <input
-            type="email"
-            className="form-control name"
-            placeholder="E-mail"
-            id="defaultFormRegisterEmailEx"
-            value={email}
-            required
-            autoFocus
-            onChange={(e) => setEmail(e.target.value)}
-           />
-           <div class="invalid-feedback">Email is not valid!</div>
+           {newStudent === "new" || (newStudent === "part" && part.email === "") ? (
+            <>
+             {" "}
+             <input
+              type="email"
+              className="form-control name"
+              placeholder="E-mail"
+              id="defaultFormRegisterEmailEx"
+              value={email}
+              required
+              autoFocus
+              onChange={(e) => setEmail(e.target.value)}
+             />
+             <div class="invalid-feedback">Email is not valid!</div>
+             <br />
+            </>
+           ) : null}
 
-           <br />
+           {newStudent === "new" || (newStudent === "part" && part.gender === "") ? (
+            <>
+             <select
+              className="form-select"
+              id="inputGroupSelect01"
+              onChange={(e) => {
+               setGender(e.target.value);
+              }}
+             >
+              <option value="" disabled selected hidden>
+               Gender
+              </option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+             </select>
+             <br />
+            </>
+           ) : null}
 
-           {newStudent === "new" ? (
+           {newStudent === "new" || (newStudent === "part" && part.role === "") ? (
+            <>
+             <select
+              className="form-select"
+              id="inputGroupSelect01"
+              onChange={(e) => {
+               setRole(e.target.value);
+              }}
+             >
+              <option value="" disabled selected hidden>
+               Role
+              </option>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="parent">Parent</option>
+              <option value="working professional">Working Professional</option>
+             </select>
+             <br />
+            </>
+           ) : null}
+
+           {newStudent === "new" || (newStudent === "part" && part.dob === "") ? (
             <>
              <input
               type="text"
               className="form-control name"
-              placeholder="Gender"
-              value={gender}
-              id="defaultFormRegisterGenderEx"
-              required
-              onChange={(e) => setGender(e.target.value)}
+              placeholder="Date of Birth: dd/mm/yyyy"
+              value={dob}
+              id="defaultFormRegisterdobEx"
+              pattern="^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$"
+              onChange={(e) => setDob(e.target.value)}
              />
-             <div class="invalid-feedback">Gender should be either Male or Female</div>
-             <br />
-             <input
-              type="text"
-              className="form-control name"
-              placeholder="Role"
-              id="defaultFormRegisterRoleEx"
-              value={role}
-              required
-              onChange={(e) => setRole(e.target.value)}
-             />
-             <div class="invalid-feedback">Role should not be empty</div>
-
-             <br />
+             <div class="invalid-feedback">Valid format for Date of Birth: dd/mm/yyyy</div>
             </>
            ) : null}
-           <input
-            type="text"
-            className="form-control name"
-            placeholder="Date of Birth: dd/mm/yyyy"
-            value={dob}
-            id="defaultFormRegisterdobEx"
-            required
-            pattern="^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$"
-            onChange={(e) => setDob(e.target.value)}
-           />
-           <div class="invalid-feedback">Valid format for Date of Birth: dd/mm/yyyy</div>
           </main>
           <button className="btn-form" submit>
            Submit
@@ -265,11 +359,167 @@ function Form() {
       </Grid>
      </Grid>
     ) : (
-     <div class="jumbotron text-center thankyou">
-      <h1 class="display-3">Thank You!</h1>
+     <>
+      <div class="video-container">
+       <div className="nav-bar">
+        <Accordion
+         expanded={menu}
+         onChange={() => {
+          setMenu(!menu);
+         }}
+         style={{ zIndex: "4", backgroundColor: "#1F1B24" }}
+        >
+         <AccordionSummary expandIcon={<Menu style={{ color: "pink" }} />} aria-controls="panel1bh-content" id="panel1bh-header">
+          <Typography style={{ color: "pink" }}>ARJUNA GROUP</Typography>
+         </AccordionSummary>
+         <AccordionDetails>
+          <List style={{ textAlign: "center", width: "100%" }} component="nav">
+           <ListItem button>
+            <ListItemText style={{ textAlign: "center", color: "pink" }} primary="WEBINARS" />
+           </ListItem>
+           <ListItem button>
+            <ListItemText style={{ textAlign: "center", color: "pink" }} primary="COURSES" />
+           </ListItem>
 
-      <hr />
-     </div>
+           <ListItem button>
+            <ListItemText style={{ textAlign: "center", color: "pink" }} primary="ABOUT" />
+           </ListItem>
+           <Divider style={{ color: "pink" }} />
+           <ListItem>
+            <div style={{ textAlign: "center", width: "100%" }}>
+             <ListItemIcon button>
+              <Mail style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
+             </ListItemIcon>
+             <ListItemIcon>
+              <Facebook style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
+             </ListItemIcon>
+             <ListItemIcon>
+              <WhatsApp style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
+             </ListItemIcon>
+             <ListItemIcon>
+              <YouTube style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
+             </ListItemIcon>
+            </div>
+           </ListItem>
+          </List>
+         </AccordionDetails>
+        </Accordion>
+       </div>
+
+       <div className="video-overlay"></div>
+
+       <div className="icons-overlay">
+        <Button style={{ fontSize: "20px", color: "white", margin: "10px" }}>WEBINARS</Button>
+        <Button style={{ fontSize: "20px", color: "white", margin: "10px" }}>COURSES</Button>
+        <Button style={{ fontSize: "20px", color: "white", margin: "10px" }}>ABOUT</Button>
+
+        <Mail style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
+        <Facebook style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
+        <WhatsApp style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
+        {/* <LinkedIn style={{ fontSize: "80px", color: "pink" }} />
+        <Twitter style={{ fontSize: "80px", color: "pink" }} />
+        <Telegram style={{ fontSize: "80px", color: "pink" }} /> */}
+        <YouTube style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
+       </div>
+
+       <div className="text-overlay">
+        <p style={{ fontSize: "80px" }}>Thank You</p>
+        <p style={{ maxWidth: "600px", width: "100%", fontSize: "23px" }}>
+         We hope that you will take maximum benifit from our webinars and fly with colours in every aspect of our life
+        </p>
+        <a href="https://www.studentthinkbox.com/" class="btn-sample">
+         VISIT OUR WEBSITE
+        </a>
+       </div>
+       <video
+        preload
+        autoplay
+        muted
+        loop
+        id="myVideo"
+        src="https://res.cloudinary.com/arjunadb/video/upload/v1621491362/Real_Self_Confidence___Discover_the_Power_of_a_Selfless_Purpose___Amal_M_Das_pj8iww.mp4"
+       ></video>
+      </div>
+      <div className="carousel-wrapper">
+       <Carousel
+        className="carousel"
+        showDots={true}
+        responsive={responsive}
+        ssr={true} // means to render carousel on server-side.
+        infinite={true}
+        autoPlay={true}
+        autoPlaySpeed={2000}
+        keyBoardControl={true}
+        customTransition="all .5"
+        transitionDuration={1000}
+        removeArrowOnDeviceType={["tablet", "mobile"]}
+        deviceType={deviceType}
+       >
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=1vWZGzKlt8M">
+          <img src="https://img.youtube.com/vi/1vWZGzKlt8M/0.jpg" />
+         </a>
+        </div>
+
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=OKUYNoex6Ag">
+          <img src="https://img.youtube.com/vi/OKUYNoex6Ag/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=QHfD72Z9-uA">
+          <img src="https://img.youtube.com/vi/QHfD72Z9-uA/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=V7Ftxz-ytcE">
+          <img src="https://img.youtube.com/vi/V7Ftxz-ytcE/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=c_1lo50AVVU">
+          <img src="https://img.youtube.com/vi/c_1lo50AVVU/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=wcmiFAvITtU">
+          <img src="https://img.youtube.com/vi/wcmiFAvITtU/0.jpg" />
+         </a>
+        </div>
+
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=EvLTYvj0Vto">
+          <img src="https://img.youtube.com/vi/EvLTYvj0Vto/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=nNnFg92mmGo">
+          <img src="https://img.youtube.com/vi/nNnFg92mmGo/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=jQidcUBKGBI">
+          <img src="https://img.youtube.com/vi/jQidcUBKGBI/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=1SKWtBH7s8M">
+          <img src="https://img.youtube.com/vi/1SKWtBH7s8M/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=Ghkx3ZP07Uc">
+          <img src="https://img.youtube.com/vi/Ghkx3ZP07Uc/0.jpg" />
+         </a>
+        </div>
+        <div className="crop">
+         <a href="https://www.youtube.com/watch?v=6qBa_0SSdN4">
+          <img src="https://img.youtube.com/vi/6qBa_0SSdN4/0.jpg" />
+         </a>
+        </div>
+       </Carousel>
+      </div>
+     </>
     )}
    </Route>
   </Switch>

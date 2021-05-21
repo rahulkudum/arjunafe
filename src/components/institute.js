@@ -19,8 +19,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 import ResponsiveDrawer from "./ui/drawer";
 import { UserList, WebinarList, Filter } from "./context/storage";
-import ScriptTag from "react-script-tag";
-import { Cloudinary } from "cloudinary-core";
+
+var QRCode = require("qrcode.react");
 
 const useStyles = makeStyles((theme) => ({
  root: {
@@ -51,6 +51,8 @@ function Institute() {
  const [instituteList, setInstituteList] = useState([]);
  const [start, setStart] = useState(0);
  const [backdrop, setBackdrop] = useState(false);
+ const [showQr, setShowQr] = useState(false);
+ const [valueQr, setValueQr] = useState("");
 
  useEffect(() => {
   setBackdrop(true);
@@ -110,6 +112,29 @@ function Institute() {
 
     <main className={classes.content}>
      <div className={classes.toolbar} />
+     {showQr ? <QRCode value={valueQr} size={280} /> : null}
+     <button
+      onClick={() => {
+       //  axios.get("http://localhost:5000/webinar/wa").then((res) => {
+       //   setValueQr(res.data);
+       //   setShowQr(true);
+       //  });
+
+       const events = new EventSource("http://localhost:5000/webinar/wa");
+       let count = 0;
+       events.onmessage = (event) => {
+        count++;
+        const parsedData = JSON.parse(event.data);
+        console.log(event, parsedData);
+        if (count === 1) {
+         setValueQr(parsedData);
+         setShowQr(true);
+        }
+       };
+      }}
+     >
+      Qr code
+     </button>
 
      <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
