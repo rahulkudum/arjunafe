@@ -61,7 +61,7 @@ function Form(props) {
  const [gender, setGender] = useState("");
  const [role, setRole] = useState("");
  const [newStudent, setNewStudent] = useState("");
- const [done, setDone] = useState(true);
+ const [done, setDone] = useState(false);
  const [id, setId] = useState("");
  const [deviceType, setDeviceType] = useState("mobile");
  const [part, setPart] = useState({ email: "", gender: "", role: "", dob: "" });
