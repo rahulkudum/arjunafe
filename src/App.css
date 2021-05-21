@@ -291,7 +291,13 @@
   top: 25%;
  }
  .div-signin p {
-  font-size: 14px;
+  font-size: 16px;
+ }
+
+ .btn-form {
+  height: 40px;
+  font-size: 20px;
+  border: 5px solid black;
  }
  .nav-bar {
   display: block;
