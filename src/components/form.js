@@ -423,10 +423,8 @@ function Form(props) {
        </div>
 
        <div className="text-overlay">
-        <p style={{ fontSize: "80px" }}>Thank You</p>
-        <p style={{ maxWidth: "600px", width: "100%", fontSize: "23px" }}>
-         We hope that you will take maximum benifit from our webinars and fly with colours in every aspect of our life
-        </p>
+        <h1>Thank You</h1>
+        <p>We hope that you will take maximum benifit from our webinars and fly with colours in every aspect of our life</p>
         <a href="https://www.studentthinkbox.com/" class="btn-sample">
          VISIT OUR WEBSITE
         </a>
