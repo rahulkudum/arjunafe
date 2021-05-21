@@ -205,7 +205,6 @@ function Form(props) {
             placeholder="Name"
             value={name}
             required
-            autoFocus
             id="defaultFormRegisterNameEx"
             onChange={(e) => setName(e.target.value)}
            />
@@ -225,7 +224,7 @@ function Form(props) {
            <div class="invalid-feedback">Mobile Number is not valid!</div>
           </main>
 
-          <button className="btn-form" submit>
+          <button className="btn-form" submit autoFocus>
            Submit
           </button>
          </form>
@@ -287,7 +286,6 @@ function Form(props) {
               id="defaultFormRegisterEmailEx"
               value={email}
               required
-              autoFocus
               onChange={(e) => setEmail(e.target.value)}
              />
              <div class="invalid-feedback">Email is not valid!</div>
@@ -350,7 +348,7 @@ function Form(props) {
             </>
            ) : null}
           </main>
-          <button className="btn-form" submit>
+          <button className="btn-form" submit autoFocus>
            Submit
           </button>
          </form>
