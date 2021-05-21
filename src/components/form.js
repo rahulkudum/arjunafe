@@ -142,16 +142,7 @@ function Form(props) {
 
       <Grid item xs={12} xl={6} lg={6} md={6} sm={12} style={{ margin: "0", padding: "0" }}>
        <div className="page3">
-        <div
-         style={{
-          width: "100%",
-          height: "150px",
-          backgroundColor: "#343f56",
-          color: "white",
-          fontSize: "50px",
-          position: "relative",
-         }}
-        >
+        <div className="form-head">
          <p style={{ position: "absolute", top: "50%", left: "50%", transform: "translateX(-50%) translateY(-50%)" }}>Registration</p>
         </div>
 
