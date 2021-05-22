@@ -28,6 +28,7 @@
   "react-script-tag": "^1.1.2",
   "react-scripts": "^2.1.8",
   "react-share": "^4.4.0",
+  "socket.io-client": "^4.1.2",
   "web-vitals": "^0.2.4",
   "xlsx": "^0.16.9"
  },

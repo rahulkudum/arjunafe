@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { Switch, Route, useHistory, useParams, useRouteMatch } from "react-router-dom";
 import axios from "axios";
 import XLSX from "xlsx";
@@ -22,6 +22,7 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import MailIcon from "@material-ui/icons/Mail";
 import { FormLabel, Radio, RadioGroup, FormControlLabel, Typography, Menu as Dropdown, MenuItem } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import io from "socket.io-client";
 
 import {
  EmailShareButton,
@@ -114,7 +115,7 @@ function Webinar(props) {
  const [waResult, setWaResult] = useState({ start: false, end: false, data: "" });
  const [mailDetails, setMailDetails] = useState({ emailid: "", password: "", service: "gmail", subject: "", body: "", attachments: [], calendar: null });
  const [anchorEl, setAnchorEl] = useState(null);
-
+ const socketRef = useRef();
  useEffect(() => {
   if (webinarList.length === 0) {
    setBackdrop(true);
@@ -1554,8 +1555,16 @@ function Webinar(props) {
        onClick={() => {
         setQrCode("");
         setOpenWa(false);
-        setWaSuccess([]);
-        setWaFail([]);
+        setWaSuccess((prev) => {
+         let dum = [...prev];
+         dum = [];
+         return dum;
+        });
+        setWaFail((prev) => {
+         let dum = [...prev];
+         dum = [];
+         return dum;
+        });
         setWaResult((prev) => {
          let dum = { ...prev };
          dum.start = false;
@@ -1569,20 +1578,25 @@ function Webinar(props) {
        Cancel
       </Button>
       <Button
-       onClick={() => {
-        console.log("sending request");
-        const params = encodeURI(`msg=${waText}&webinarid=${currentWebinar._id}`);
-        console.log(params);
-        const events = new EventSource("https://arjuandb.herokuapp.com/webinar/wa?" + params, {
-         headers: {
-          "Access-Control-Allow-Origin": "*",
-         },
-        });
+       onClick={async () => {
+        socketRef.current = await io.connect("http://localhost:5000");
+
+        axios
+         .post("http://localhost:5000/webinar/wa", { msg: waText, webinarid: currentWebinar._id })
+         .then((res) => {
+          console.log(res);
+         })
+         .catch((err) => {
+          console.log(err);
+          socketRef.current.close();
+          socketRef.current = null;
+         });
+
         let count = 0;
-        events.onmessage = (event) => {
+        socketRef.current.on("wa", (res) => {
          count++;
-         const parsedData = JSON.parse(event.data);
-         console.log(event, parsedData);
+         const parsedData = JSON.parse(res);
+
          if (count === 1) {
           setQrCode(parsedData);
          }
@@ -1625,9 +1639,10 @@ function Webinar(props) {
             dum.end = true;
             return dum;
            });
+           socketRef.current.close();
           }
          }
-        };
+        });
        }}
        color="primary"
       >
@@ -1929,8 +1944,16 @@ function Webinar(props) {
       <Button
        onClick={() => {
         setOpenMail(false);
-        setWaSuccess([]);
-        setWaFail([]);
+        setWaSuccess((prev) => {
+         let dum = [...prev];
+         dum = [];
+         return dum;
+        });
+        setWaFail((prev) => {
+         let dum = [...prev];
+         dum = [];
+         return dum;
+        });
 
         setWaResult((prev) => {
          let dum = { ...prev };
@@ -1946,19 +1969,24 @@ function Webinar(props) {
       </Button>
       <Button
        onClick={() => {
-        console.log("sending request");
-        const params = encodeURI(`details=${JSON.stringify(mailDetails)}&webinarid=${currentWebinar._id}`);
-        console.log(params);
-        const events = new EventSource("https://arjuandb.herokuapp.com/webinar/wa?" + params, {
-         headers: {
-          "Access-Control-Allow-Origin": "*",
-         },
-        });
+        socketRef.current = io.connect("http://localhost:5000");
+
+        axios
+         .post("http://localhost:5000/webinar/email", { details: mailDetails, webinarid: currentWebinar._id })
+         .then((res) => {
+          console.log(res);
+         })
+         .catch((err) => {
+          console.log(err);
+          socketRef.current.close();
+          socketRef.current = null;
+         });
+
         let count = 0;
-        events.onmessage = (event) => {
+        socketRef.current.on("email", (res) => {
          count++;
-         const parsedData = JSON.parse(event.data);
-         console.log(event, parsedData);
+         const parsedData = JSON.parse(res);
+         console.log(parsedData);
          if (count === 1) {
           setWaResult((prev) => {
            let dum = { ...prev };
@@ -1966,8 +1994,6 @@ function Webinar(props) {
            return dum;
           });
          }
-
-         console.log(parsedData);
 
          if (parsedData.indexOf("success") !== -1) {
           setWaSuccess((prev) => {
@@ -1989,8 +2015,9 @@ function Webinar(props) {
            dum.end = true;
            return dum;
           });
+          socketRef.current.close();
          }
-        };
+        });
        }}
        color="primary"
       >
