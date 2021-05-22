@@ -20,6 +20,8 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import MailIcon from "@material-ui/icons/Mail";
+import { FormLabel, Radio, RadioGroup, FormControlLabel, Typography, Menu as Dropdown, MenuItem } from "@material-ui/core";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import {
  EmailShareButton,
@@ -38,6 +40,9 @@ import {
 
 import ResponsiveDrawer from "./ui/drawer";
 import { UserList, WebinarList } from "./context/storage";
+import { Mail, MoreVert, WhatsApp } from "@material-ui/icons";
+
+var QRCode = require("qrcode.react");
 
 const useStyles = makeStyles((theme) => ({
  root: {
@@ -100,6 +105,15 @@ function Webinar(props) {
  const [search, setSearch] = useState([{ property: "name", operator: "=", value: "" }]);
  const [search2, setSearch2] = useState([{ property: "name", operator: "=", value: "" }]);
  const [instituteFields, setInstituteFields] = useState({ name: "", campus: "", location: "", inumber: "", imail: "", pnumber: "", pmail: "", poc: "" });
+ const [openWa, setOpenWa] = useState(false);
+ const [openMail, setOpenMail] = useState(false);
+ const [qrCode, setQrCode] = useState("");
+ const [waText, setWaText] = useState("");
+ const [waSuccess, setWaSuccess] = useState([]);
+ const [waFail, setWaFail] = useState([]);
+ const [waResult, setWaResult] = useState({ start: false, end: false, data: "" });
+ const [mailDetails, setMailDetails] = useState({ emailid: "", password: "", service: "gmail", subject: "", body: "", attachments: [], calendar: null });
+ const [anchorEl, setAnchorEl] = useState(null);
 
  useEffect(() => {
   if (webinarList.length === 0) {
@@ -326,161 +340,244 @@ function Webinar(props) {
             </td>
             <td>
              <button
-              className="btn"
-              style={{ color: "blue" }}
-              onClick={() => {
-               setCurrentWebinar(val);
-               var tempInput = document.createElement("input");
-               tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-               tempInput.value = encodeURI(`https://tinyurl.com/arjuna${val.date.slice(-2)}${val._id.slice(-2)}`);
-               document.body.appendChild(tempInput);
-               tempInput.select();
-               document.execCommand("copy");
-               document.body.removeChild(tempInput);
-
-               setOpen7(true);
+              className="btn-sample-blue"
+              onClick={(e) => {
+               setAnchorEl(e.currentTarget);
               }}
              >
-              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
-               <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
-              </svg>
+              <MoreVert />
              </button>
-             <button
-              className="btn"
-              style={{ color: "green" }}
-              onClick={() => {
-               const apiResources = val.users.map((user, j) => {
-                return { id: user };
-               });
 
-               async function getAllUrls(urls) {
-                try {
-                 var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/findbyid", url).then((res) => res.data)));
-                 const excelArray = datas
-                  .filter((data) => data)
-                  .map((data, i) => {
-                   return [
-                    data.name,
-                    data.number,
-                    data.email,
-                    data.gender,
-                    data.dob,
-                    data.beyr10,
-                    data.beyr12,
-                    data.eeyr,
-                    data.educationid,
-                    data.volunteerwork,
-                    data.arjunapoc,
-                    data.communicationmethod,
-                    data.subscriptionstatus,
-                    data.lastcontact,
-                    data.webinarscount,
-                    data.coursescount,
-                   ];
-                  });
+             <Dropdown
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={() => {
+               setAnchorEl(null);
+              }}
+             >
+              <MenuItem
+               onClick={() => {
+                setAnchorEl(null);
+               }}
+              >
+               <button
+                className="btn"
+                style={{ color: "blue" }}
+                onClick={() => {
+                 setCurrentWebinar(val);
+                 var tempInput = document.createElement("input");
+                 tempInput.style = "position: absolute; left: -1000px; top: -1000px";
+                 tempInput.value = encodeURI(`https://tinyurl.com/arjuna${val.date.slice(-2)}${val._id.slice(-2)}`);
+                 document.body.appendChild(tempInput);
+                 tempInput.select();
+                 document.execCommand("copy");
+                 document.body.removeChild(tempInput);
 
-                 var wb = XLSX.utils.book_new();
-                 wb.Props = {
-                  Title: "Registered Students",
-                  Subject: "Registered Students",
-                  Author: "Arjuna",
-                  CreatedDate: new Date(),
-                 };
+                 setOpen7(true);
+                }}
+               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+                 <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+                </svg>
+               </button>
+              </MenuItem>
 
-                 wb.SheetNames.push("Registered Students");
+              <MenuItem
+               onClick={() => {
+                setAnchorEl(null);
+               }}
+              >
+               <Button
+                onClick={() => {
+                 setMailDetails((prev) => {
+                  let dum = { ...prev };
+                  dum.body =
+                   "Hi {{name}}, You have regisered for {{webinar}} webinar on {{date}}. The speaker for this webinar is {{speaker}} and cheif guest is {{guest}}, so please don't miss it";
+                  dum.subject = "Invitation for {{webinar}} webinar";
 
-                 var ws = XLSX.utils.aoa_to_sheet([
-                  [
-                   "Name",
-                   "Phone name",
-                   "Email",
-                   "Gender",
-                   "DOB",
-                   "10BEYr",
-                   "12BEYr",
-                   "EEYr",
-                   "EducationId",
-                   "VolunteerWork",
-                   "ArjunaPOC",
-                   "CommunicationMethod",
-                   "SubscriptionStatus",
-                   "LastContact",
-                   "WebinarsCount",
-                   "CoursesCount",
-                  ],
-                  ...excelArray,
-                 ]);
-                 wb.Sheets["Registered Students"] = ws;
-                 var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
-                 function s2ab(s) {
-                  var buf = new ArrayBuffer(s.length);
-                  var view = new Uint8Array(buf);
-                  for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
-                  return buf;
+                  return dum;
+                 });
+                 setCurrentWebinar(val);
+                 setOpenMail(true);
+                }}
+               >
+                <Mail style={{ color: "orange", fontSize: "30px" }} />
+               </Button>
+              </MenuItem>
+              <MenuItem
+               onClick={() => {
+                setAnchorEl(null);
+               }}
+              >
+               <Button
+                onClick={() => {
+                 setWaText(
+                  "Hi {{name}}, You have regisered for {{webinar}} webinar on {{date}}. The speaker for this webinar is {{speaker}} and cheif guest is {{guest}}, so please don't miss it"
+                 );
+                 setCurrentWebinar(val);
+                 setOpenWa(true);
+                }}
+               >
+                <WhatsApp style={{ color: "green", fontSize: "30px" }} />
+               </Button>
+              </MenuItem>
+              <MenuItem
+               onClick={() => {
+                setAnchorEl(null);
+               }}
+              >
+               <button
+                className="btn"
+                style={{ color: "green" }}
+                onClick={() => {
+                 const apiResources = val.users.map((user, j) => {
+                  return { id: user };
+                 });
+
+                 async function getAllUrls(urls) {
+                  try {
+                   var datas = await Promise.all(urls.map((url) => axios.post("https://arjunadb.herokuapp.com/user/findbyid", url).then((res) => res.data)));
+                   const excelArray = datas
+                    .filter((data) => data)
+                    .map((data, i) => {
+                     return [
+                      data.name,
+                      data.number,
+                      data.email,
+                      data.gender,
+                      data.dob,
+                      data.beyr10,
+                      data.beyr12,
+                      data.eeyr,
+                      data.educationid,
+                      data.volunteerwork,
+                      data.arjunapoc,
+                      data.communicationmethod,
+                      data.subscriptionstatus,
+                      data.lastcontact,
+                      data.webinarscount,
+                      data.coursescount,
+                     ];
+                    });
+
+                   var wb = XLSX.utils.book_new();
+                   wb.Props = {
+                    Title: "Registered Students",
+                    Subject: "Registered Students",
+                    Author: "Arjuna",
+                    CreatedDate: new Date(),
+                   };
+
+                   wb.SheetNames.push("Registered Students");
+
+                   var ws = XLSX.utils.aoa_to_sheet([
+                    [
+                     "Name",
+                     "Phone name",
+                     "Email",
+                     "Gender",
+                     "DOB",
+                     "10BEYr",
+                     "12BEYr",
+                     "EEYr",
+                     "EducationId",
+                     "VolunteerWork",
+                     "ArjunaPOC",
+                     "CommunicationMethod",
+                     "SubscriptionStatus",
+                     "LastContact",
+                     "WebinarsCount",
+                     "CoursesCount",
+                    ],
+                    ...excelArray,
+                   ]);
+                   wb.Sheets["Registered Students"] = ws;
+                   var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+                   function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+                    return buf;
+                   }
+
+                   saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), val.pwebinar.name + " (" + val.date + ")" + ".xlsx");
+                  } catch (error) {
+                   console.log(error);
+                  }
                  }
 
-                 saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), val.pwebinar.name + " (" + val.date + ")" + ".xlsx");
-                } catch (error) {
-                 console.log(error);
-                }
-               }
-
-               getAllUrls(apiResources);
-              }}
-             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
-               <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z" />
-              </svg>
-             </button>
-             <button
-              type="button"
-              class="btn"
-              style={{ color: "blue" }}
-              onClick={() => {
-               setCurrentWebinar(val);
-               setCurrentWebinarNo(i);
-               setOpen6(true);
-              }}
-             >
-              <svg
-               xmlns="http://www.w3.org/2000/svg"
-               width="30"
-               height="30"
-               fill="currentColor"
-               class="bi bi-file-earmark-spreadsheet-fill"
-               viewBox="0 0 16 16"
+                 getAllUrls(apiResources);
+                }}
+               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+                 <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z" />
+                </svg>
+               </button>
+              </MenuItem>
+              <MenuItem
+               onClick={() => {
+                setAnchorEl(null);
+               }}
               >
-               <path d="M6 12v-2h3v2H6z" />
-               <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM3 9h10v1h-3v2h3v1h-3v2H9v-2H6v2H5v-2H3v-1h2v-2H3V9z" />
-              </svg>
-             </button>
-             <button
-              type="button"
-              class="btn"
-              style={{ color: "red" }}
-              onClick={() => {
-               setBackdrop(true);
-               axios
-                .post("https://arjunadb.herokuapp.com/webinar/delete", { id: val._id })
-                .then((res) => {
-                 console.log(res);
+               <button
+                type="button"
+                class="btn"
+                style={{ color: "blue" }}
+                onClick={() => {
+                 setCurrentWebinar(val);
+                 setCurrentWebinarNo(i);
+                 setOpen6(true);
+                }}
+               >
+                <svg
+                 xmlns="http://www.w3.org/2000/svg"
+                 width="30"
+                 height="30"
+                 fill="currentColor"
+                 class="bi bi-file-earmark-spreadsheet-fill"
+                 viewBox="0 0 16 16"
+                >
+                 <path d="M6 12v-2h3v2H6z" />
+                 <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM3 9h10v1h-3v2h3v1h-3v2H9v-2H6v2H5v-2H3v-1h2v-2H3V9z" />
+                </svg>
+               </button>
+              </MenuItem>
+              <MenuItem
+               onClick={() => {
+                setAnchorEl(null);
+               }}
+              >
+               <button
+                type="button"
+                class="btn"
+                style={{ color: "red" }}
+                onClick={() => {
+                 setBackdrop(true);
+                 axios
+                  .post("https://arjunadb.herokuapp.com/webinar/delete", { id: val._id })
+                  .then((res) => {
+                   console.log(res);
 
-                 setWebinarList((prev) => {
-                  return prev.filter((item, k) => k !== i);
-                 });
-                 setBackdrop(false);
-                })
-                .catch((err) => console.log(err));
-              }}
-             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-               <path
-                fill-rule="evenodd"
-                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-               />
-              </svg>
-             </button>
+                   setWebinarList((prev) => {
+                    return prev.filter((item, k) => k !== i);
+                   });
+                   setBackdrop(false);
+                  })
+                  .catch((err) => console.log(err));
+                }}
+               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                 <path
+                  fill-rule="evenodd"
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                 />
+                </svg>
+               </button>
+              </MenuItem>
+             </Dropdown>
             </td>
            </tr>
           );
@@ -1410,6 +1507,481 @@ function Webinar(props) {
        color="primary"
       >
        Cancel
+      </Button>
+     </DialogActions>
+    </Dialog>
+
+    <Dialog fullScreen={fullScreen} open={openWa} onClose={() => {}} aria-labelledby="responsive-dialog-title">
+     <DialogTitle id="responsive-dialog-title">Send WhatsApp Messeage </DialogTitle>
+     <DialogContent>
+      {qrCode ? (
+       <QRCode value={qrCode} size="360" />
+      ) : (
+       <>
+        {!waResult.start ? (
+         <TextField
+          style={{ width: "500px" }}
+          id="outlined-multiline-static"
+          label=""
+          multiline
+          rows={4}
+          value={waText}
+          onChange={(e) => {
+           setWaText(e.target.value);
+          }}
+          variant="outlined"
+         />
+        ) : (
+         <div>
+          {waResult.end ? <Typography>Completed, {waResult.data}</Typography> : <Typography>Task in progress...</Typography>}
+          <br />
+          <Typography>Messages Sent Succesfully: </Typography>
+          {waSuccess.map((val) => {
+           return <Typography>{val}</Typography>;
+          })}
+          <br />
+          {waFail.length ? <Typography>Messages Sending Failed: </Typography> : null}
+          {waFail.map((val) => {
+           return <Typography>{val}</Typography>;
+          })}
+         </div>
+        )}
+       </>
+      )}
+     </DialogContent>
+     <DialogActions>
+      <Button
+       onClick={() => {
+        setQrCode("");
+        setOpenWa(false);
+        setWaResult((prev) => {
+         let dum = { ...prev };
+         dum.start = false;
+         dum.end = false;
+         dum.data = "";
+         return dum;
+        });
+       }}
+       color="primary"
+      >
+       Cancel
+      </Button>
+      <Button
+       onClick={() => {
+        console.log("sending request");
+        const params = encodeURI(`msg=${waText}&webinarid=${currentWebinar._id}`);
+        console.log(params);
+        const events = new EventSource("http://localhost:5000/webinar/wa?" + params);
+        let count = 0;
+        events.onmessage = (event) => {
+         count++;
+         const parsedData = JSON.parse(event.data);
+         console.log(event, parsedData);
+         if (count === 1) {
+          setQrCode(parsedData);
+         }
+         if (count > 1) {
+          console.log(parsedData);
+          setQrCode("");
+
+          if (parsedData.indexOf("success") !== -1) {
+           if (count === 2) {
+            setWaResult((prev) => {
+             let dum = { ...prev };
+             dum.start = true;
+             return dum;
+            });
+           }
+           setWaSuccess((prev) => {
+            let dum = [...prev];
+            dum.push(parsedData.slice(9));
+            return dum;
+           });
+          }
+          if (parsedData.indexOf("fail") !== -1) {
+           if (count === 2) {
+            setWaResult((prev) => {
+             let dum = { ...prev };
+             dum.start = true;
+             return dum;
+            });
+           }
+           setWaFail((prev) => {
+            let dum = [...prev];
+            dum.push(parsedData.slice(6));
+            return dum;
+           });
+          }
+          if (parsedData.indexOf("Result") !== -1) {
+           setWaResult((prev) => {
+            let dum = { ...prev };
+            dum.data = parsedData;
+            dum.end = true;
+            return dum;
+           });
+          }
+         }
+        };
+       }}
+       color="primary"
+      >
+       Next
+      </Button>
+     </DialogActions>
+    </Dialog>
+
+    <Dialog fullScreen={fullScreen} open={openMail} onClose={() => {}} aria-labelledby="responsive-dialog-title">
+     <DialogTitle id="responsive-dialog-title">Send E-Mails </DialogTitle>
+     <DialogContent>
+      <>
+       {!waResult.start ? (
+        <>
+         <TextField
+          style={{ width: "500px", margin: "10px" }}
+          label="Email ID"
+          value={mailDetails.emailid}
+          onChange={(e) => {
+           setMailDetails((prev) => {
+            let dum = { ...prev };
+            dum.emailid = e.target.value;
+            return dum;
+           });
+          }}
+         />
+         <TextField
+          style={{ width: "500px", margin: "10px" }}
+          id="outlined-multiline-static"
+          label="Password"
+          type="password"
+          value={mailDetails.password}
+          onChange={(e) => {
+           setMailDetails((prev) => {
+            let dum = { ...prev };
+            dum.password = e.target.value;
+            return dum;
+           });
+          }}
+         />
+         <Typography>
+          Service:
+          <RadioGroup
+           row
+           value={mailDetails.service}
+           onChange={(e) => {
+            setMailDetails((prev) => {
+             let dum = { ...prev };
+             dum.service = e.target.value;
+             return dum;
+            });
+           }}
+          >
+           <FormControlLabel value="gmail" control={<Radio />} label="Gmail" />
+           <FormControlLabel value="hotmail" control={<Radio />} label="Outlook" />
+          </RadioGroup>
+         </Typography>
+
+         <TextField
+          style={{ width: "500px", margin: "10px" }}
+          id="outlined-multiline-static"
+          label="Subject"
+          value={mailDetails.subject}
+          onChange={(e) => {
+           setMailDetails((prev) => {
+            let dum = { ...prev };
+            dum.subject = e.target.value;
+            return dum;
+           });
+          }}
+         />
+
+         <TextField
+          style={{ width: "500px", margin: "10px" }}
+          id="outlined-multiline-static"
+          multiline
+          rows={4}
+          value={mailDetails.body}
+          onChange={(e) => {
+           setMailDetails((prev) => {
+            let dum = { ...prev };
+            dum.body = e.target.value;
+            return dum;
+           });
+          }}
+          variant="outlined"
+         />
+         <Typography>
+          Attachments:
+          <Radio
+           checked={mailDetails.attachments.length !== 0}
+           onChange={() => {
+            setMailDetails((prev) => {
+             let dum = { ...prev };
+             dum.attachments.push(`https://res.cloudinary.com/arjunadb/image/upload/webinar_posters/${currentWebinar._id}.jpg`);
+             return dum;
+            });
+           }}
+          />
+          Yes
+          <Radio
+           checked={mailDetails.attachments.length === 0}
+           onChange={() => {
+            setMailDetails((prev) => {
+             let dum = { ...prev };
+             dum.attachments = [];
+             return dum;
+            });
+           }}
+          />
+          No
+         </Typography>
+
+         {mailDetails.attachments.map((val, i) => {
+          if (i === mailDetails.attachments.length - 1) {
+           return (
+            <>
+             <TextField
+              style={{ width: "450px", margin: "10px" }}
+              id="outlined-multiline-static"
+              label="Attachment"
+              value={mailDetails.attachments[i]}
+              onChange={(e) => {
+               setMailDetails((prev) => {
+                let dum = { ...prev };
+                dum.attachments[i] = e.target.value;
+                return dum;
+               });
+              }}
+             />
+             <Button
+              onClick={() => {
+               setMailDetails((prev) => {
+                let dum = { ...prev };
+                dum.attachments.push("");
+                return dum;
+               });
+              }}
+             >
+              <AddCircleOutlineIcon />
+             </Button>
+            </>
+           );
+          }
+          return (
+           <TextField
+            style={{ width: "450px", margin: "10px" }}
+            id="outlined-multiline-static"
+            label="Attachment"
+            value={mailDetails.attachments[i]}
+            onChange={(e) => {
+             setMailDetails((prev) => {
+              let dum = { ...prev };
+              dum.attachments[i] = e.target.value;
+              return dum;
+             });
+            }}
+           />
+          );
+         })}
+         <Typography>
+          Calendar event:
+          <Radio
+           checked={mailDetails.calendar}
+           onChange={() => {
+            setMailDetails((prev) => {
+             let dum = { ...prev };
+             dum.calendar = { title: currentWebinar.pwebinar.name, description: "", location: "", date: currentWebinar.date, stime: "17:00", etime: "19:00" };
+             return dum;
+            });
+           }}
+          />
+          Yes
+          <Radio
+           checked={!mailDetails.calendar}
+           onChange={() => {
+            setMailDetails((prev) => {
+             let dum = { ...prev };
+             dum.calendar = null;
+             return dum;
+            });
+           }}
+          />
+          No
+         </Typography>
+
+         {mailDetails.calendar ? (
+          <>
+           <TextField
+            style={{ width: "450px", margin: "10px" }}
+            id="outlined-multiline-static"
+            label="Title"
+            value={mailDetails.calendar.title}
+            onChange={(e) => {
+             setMailDetails((prev) => {
+              let dum = { ...prev };
+              dum.calendar.date = e.target.value;
+              return dum;
+             });
+            }}
+           />
+
+           <TextField
+            style={{ width: "450px", margin: "10px" }}
+            id="outlined-multiline-static"
+            label="Description"
+            value={mailDetails.calendar.description}
+            onChange={(e) => {
+             setMailDetails((prev) => {
+              let dum = { ...prev };
+              dum.calendar.description = e.target.value;
+              return dum;
+             });
+            }}
+           />
+
+           <TextField
+            style={{ width: "450px", margin: "10px" }}
+            id="outlined-multiline-static"
+            label="Location"
+            value={mailDetails.calendar.location}
+            onChange={(e) => {
+             setMailDetails((prev) => {
+              let dum = { ...prev };
+              dum.calendar.location = e.target.value;
+              return dum;
+             });
+            }}
+           />
+
+           <form className={classes.root} noValidate autoComplete="off">
+            <TextField
+             style={{ width: "450px", margin: "10px", display: "inline-block" }}
+             id="outlined-multiline-static"
+             label="Date"
+             value={mailDetails.calendar.date}
+             onChange={(e) => {
+              setMailDetails((prev) => {
+               let dum = { ...prev };
+               dum.calendar.date = e.target.value;
+               return dum;
+              });
+             }}
+            />
+            <TextField
+             style={{ width: "450px", margin: "10px", display: "inline-block" }}
+             id="outlined-multiline-static"
+             label="Start Time"
+             value={mailDetails.calendar.stime}
+             onChange={(e) => {
+              setMailDetails((prev) => {
+               let dum = { ...prev };
+               dum.calendar.stime = e.target.value;
+               return dum;
+              });
+             }}
+            />
+            <TextField
+             style={{ width: "450px", margin: "10px", display: "inline-block" }}
+             id="outlined-multiline-static"
+             label="End Time"
+             value={mailDetails.calendar.etime}
+             onChange={(e) => {
+              setMailDetails((prev) => {
+               let dum = { ...prev };
+               dum.calendar.etime = e.target.value;
+               return dum;
+              });
+             }}
+            />
+           </form>
+          </>
+         ) : null}
+        </>
+       ) : (
+        <div>
+         {waResult.end ? (
+          <Typography>
+           Completed, {waSuccess.length} sent and {waFail.length} not sent
+          </Typography>
+         ) : (
+          <Typography>Task in progress...</Typography>
+         )}
+         <br />
+         <Typography>Messages Sent Succesfully: </Typography>
+         {waSuccess.map((val) => {
+          return <Typography>{val}</Typography>;
+         })}
+         <br />
+         {waFail.length ? <Typography>Messages Sending Failed: </Typography> : null}
+         {waFail.map((val) => {
+          return <Typography>{val}</Typography>;
+         })}
+        </div>
+       )}
+      </>
+     </DialogContent>
+     <DialogActions>
+      <Button
+       onClick={() => {
+        setOpenMail(false);
+        setWaResult((prev) => {
+         let dum = { ...prev };
+         dum.start = false;
+         dum.end = false;
+         dum.data = "";
+         return dum;
+        });
+       }}
+       color="primary"
+      >
+       Cancel
+      </Button>
+      <Button
+       onClick={() => {
+        console.log("sending request");
+        const params = encodeURI(`details=${JSON.stringify(mailDetails)}&webinarid=${currentWebinar._id}`);
+        console.log(params);
+        const events = new EventSource("http://localhost:5000/webinar/email?" + params);
+        let count = 0;
+        events.onmessage = (event) => {
+         count++;
+         const parsedData = JSON.parse(event.data);
+         console.log(event, parsedData);
+         if (count === 1) {
+          setWaResult((prev) => {
+           let dum = { ...prev };
+           dum.start = true;
+           return dum;
+          });
+         }
+
+         console.log(parsedData);
+
+         if (parsedData.indexOf("success") !== -1) {
+          setWaSuccess((prev) => {
+           let dum = [...prev];
+           dum.push(parsedData.slice(7));
+           return dum;
+          });
+         }
+         if (parsedData.indexOf("fail") !== -1) {
+          setWaFail((prev) => {
+           let dum = [...prev];
+           dum.push(parsedData.slice(4));
+           return dum;
+          });
+         }
+         if (parsedData.indexOf("Result") !== -1) {
+          setWaResult((prev) => {
+           let dum = { ...prev };
+           dum.end = true;
+           return dum;
+          });
+         }
+        };
+       }}
+       color="primary"
+      >
+       Next
       </Button>
      </DialogActions>
     </Dialog>

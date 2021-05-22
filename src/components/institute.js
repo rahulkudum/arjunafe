@@ -1,26 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Switch, Route, useHistory, useParams, useRouteMatch } from "react-router-dom";
+
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import InputLabel from "@material-ui/core/InputLabel";
+
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import ResponsiveDrawer from "./ui/drawer";
-import { UserList, WebinarList, Filter } from "./context/storage";
-
-var QRCode = require("qrcode.react");
 
 const useStyles = makeStyles((theme) => ({
  root: {
@@ -51,8 +37,6 @@ function Institute() {
  const [instituteList, setInstituteList] = useState([]);
  const [start, setStart] = useState(0);
  const [backdrop, setBackdrop] = useState(false);
- const [showQr, setShowQr] = useState(false);
- const [valueQr, setValueQr] = useState("");
 
  useEffect(() => {
   setBackdrop(true);
@@ -68,42 +52,12 @@ function Institute() {
    });
  }, []);
 
- useEffect(() => {
-  console.log("changed");
-  if (window.action === "closed") {
-   console.log("working");
-  }
- }, [window.action]);
-
  function popup(val) {
   console.log(val);
  }
 
  return (
   <>
-   {/* <ScriptTag type="text/javascript" src="https://upload-widget.cloudinary.com/global/all.js" />
-   <ScriptTag type="text/javascript">
-      var myWidget = cloudinary.createUploadWidget(
-    {
-     cloudName: "my_cloud_name",
-     uploadPreset: "my_preset",
-    },
-    (error, result) => {
-     if (!error && result && result.event === "success") {
-      console.log("Done! Here is the image info: ", result.info);
-     }
-    }
-   );
-
-   document.getElementById("upload_widget").addEventListener(
-    "click",
-    function () {
-     myWidget.open();
-    },
-    false
-   );
-   </ScriptTag> */}
-
    <Backdrop className={classes.backdrop} open={backdrop}>
     <CircularProgress color="inherit" />
    </Backdrop>
@@ -112,29 +66,6 @@ function Institute() {
 
     <main className={classes.content}>
      <div className={classes.toolbar} />
-     {showQr ? <QRCode value={valueQr} size={280} /> : null}
-     <button
-      onClick={() => {
-       //  axios.get("http://localhost:5000/webinar/wa").then((res) => {
-       //   setValueQr(res.data);
-       //   setShowQr(true);
-       //  });
-
-       const events = new EventSource("http://localhost:5000/webinar/wa");
-       let count = 0;
-       events.onmessage = (event) => {
-        count++;
-        const parsedData = JSON.parse(event.data);
-        console.log(event, parsedData);
-        if (count === 1) {
-         setValueQr(parsedData);
-         setShowQr(true);
-        }
-       };
-      }}
-     >
-      Qr code
-     </button>
 
      <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">

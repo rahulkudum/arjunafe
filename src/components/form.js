@@ -16,7 +16,7 @@ import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import Menu from "@material-ui/icons/Menu";
 import { ListItem, ListItemIcon } from "@material-ui/core";
-import { List } from "@material-ui/core";
+import { List, Menu as Dropdown, MenuItem } from "@material-ui/core";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import { Typography } from "@material-ui/core";
@@ -67,6 +67,7 @@ function Form(props) {
  const [part, setPart] = useState({ email: "", gender: "", role: "", dob: "" });
  const [menu, setMenu] = useState(false);
  const [keyboard, setKeyboard] = useState(false);
+ const [anchorEl, setAnchorEl] = useState(null);
 
  const responsive = {
   desktop: {
@@ -411,21 +412,59 @@ function Form(props) {
         <Button style={{ fontSize: "20px", color: "white", margin: "10px" }}>COURSES</Button>
         <Button style={{ fontSize: "20px", color: "white", margin: "10px" }}>ABOUT</Button>
 
-        <Mail style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
-        <Facebook style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
-        <WhatsApp style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
+        <Mail style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
+        <Facebook style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
+        <WhatsApp style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
         {/* <LinkedIn style={{ fontSize: "80px", color: "pink" }} />
         <Twitter style={{ fontSize: "80px", color: "pink" }} />
         <Telegram style={{ fontSize: "80px", color: "pink" }} /> */}
-        <YouTube style={{ fontSize: "60px", color: "pink", margin: "10px" }} />
+        <YouTube style={{ fontSize: "40px", color: "pink", margin: "10px" }} />
        </div>
 
        <div className="text-overlay">
         <h1>Thank You</h1>
         <p>We hope that you will take maximum benifit from our webinars and fly with colours in every aspect of our life</p>
-        <a href="https://www.studentthinkbox.com/" class="btn-sample">
-         VISIT OUR WEBSITE
+        <a href="https://www.studentthinkbox.com/" class="btn-sample-pink">
+         Visit our website
         </a>
+        <button
+         className="btn-sample-blue"
+         onClick={(e) => {
+          setAnchorEl(e.currentTarget);
+         }}
+        >
+         Add to calendar
+        </button>
+
+        <Dropdown
+         id="simple-menu"
+         anchorEl={anchorEl}
+         keepMounted
+         open={Boolean(anchorEl)}
+         onClose={() => {
+          setAnchorEl(null);
+         }}
+        >
+         <MenuItem
+          onClick={() => {
+           setAnchorEl(null);
+          }}
+         >
+          <a
+           href={`https://calendar.google.com/calendar/r/eventedit?text=testing+event&dates=20211208T170000/20211208T200000&details=chant+and+be+happy&location=Zoom`}
+          >
+           Google Calendar
+          </a>
+         </MenuItem>
+
+         <MenuItem
+          onClick={() => {
+           setAnchorEl(null);
+          }}
+         >
+          <a href={`http://localhost:5000/webinar/ical`}>Other Calendars (.ics)</a>
+         </MenuItem>
+        </Dropdown>
        </div>
        <video
         preload
@@ -447,8 +486,7 @@ function Form(props) {
         autoPlaySpeed={2000}
         keyBoardControl={true}
         customTransition="all .5"
-        transitionDuration={1000}
-        removeArrowOnDeviceType={["tablet", "mobile"]}
+        transitionDuration={100}
         deviceType={deviceType}
        >
         <div className="crop">
