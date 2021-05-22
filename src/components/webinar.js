@@ -1554,6 +1554,8 @@ function Webinar(props) {
        onClick={() => {
         setQrCode("");
         setOpenWa(false);
+        setWaSuccess([]);
+        setWaFail([]);
         setWaResult((prev) => {
          let dum = { ...prev };
          dum.start = false;
@@ -1571,7 +1573,7 @@ function Webinar(props) {
         console.log("sending request");
         const params = encodeURI(`msg=${waText}&webinarid=${currentWebinar._id}`);
         console.log(params);
-        const events = new EventSource("http://localhost:5000/webinar/wa?" + params);
+        const events = new EventSource("https://arjuandb.herokuapp.com/webinar/wa?" + params);
         let count = 0;
         events.onmessage = (event) => {
          count++;
@@ -1923,6 +1925,9 @@ function Webinar(props) {
       <Button
        onClick={() => {
         setOpenMail(false);
+        setWaSuccess([]);
+        setWaFail([]);
+
         setWaResult((prev) => {
          let dum = { ...prev };
          dum.start = false;
@@ -1940,7 +1945,7 @@ function Webinar(props) {
         console.log("sending request");
         const params = encodeURI(`details=${JSON.stringify(mailDetails)}&webinarid=${currentWebinar._id}`);
         console.log(params);
-        const events = new EventSource("http://localhost:5000/webinar/email?" + params);
+        const events = new EventSource("https://arjunadb.heokuapp.com/webinar/email?" + params);
         let count = 0;
         events.onmessage = (event) => {
          count++;

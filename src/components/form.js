@@ -462,7 +462,7 @@ function Form(props) {
            setAnchorEl(null);
           }}
          >
-          <a href={`http://localhost:5000/webinar/ical`}>Other Calendars (.ics)</a>
+          <a href={`https://arjuandb.herokuapp.com/webinar/ical`}>Other Calendars (.ics)</a>
          </MenuItem>
         </Dropdown>
        </div>
