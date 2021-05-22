@@ -1579,7 +1579,7 @@ function Webinar(props) {
       </Button>
       <Button
        onClick={async () => {
-        socketRef.current = await io.connect("https://arjunadb.herokuapp.com");
+        socketRef.current = await io.connect("https://arjunadb.herokuapp.com", { transports: ["websocket", "polling", "flashsocket"] });
 
         axios
          .post("https://arjunadb.herokuapp.com/webinar/wa", { msg: waText, webinarid: currentWebinar._id })
@@ -1969,7 +1969,7 @@ function Webinar(props) {
       </Button>
       <Button
        onClick={() => {
-        socketRef.current = io.connect("https://arjunadb.herokuapp.com");
+        socketRef.current = io.connect("https://arjunadb.herokuapp.com", { transports: ["websocket", "polling", "flashsocket"] });
 
         axios
          .post("https://arjunadb.herokuapp.com/webinar/email", { details: mailDetails, webinarid: currentWebinar._id })
