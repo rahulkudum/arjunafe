@@ -61,11 +61,12 @@ function Form(props) {
  const [gender, setGender] = useState("");
  const [role, setRole] = useState("");
  const [newStudent, setNewStudent] = useState("");
- const [done, setDone] = useState(true);
+ const [done, setDone] = useState(false);
  const [id, setId] = useState("");
  const [deviceType, setDeviceType] = useState("mobile");
  const [part, setPart] = useState({ email: "", gender: "", role: "", dob: "" });
  const [menu, setMenu] = useState(false);
+ const [keyboard, setKeyboard] = useState(false);
 
  const [anchorEl, setAnchorEl] = useState(null);
 
@@ -190,7 +191,7 @@ function Form(props) {
          >
           <div className="div-signin">
            <p>Thank you for your interest!</p>
-           <p>Kindly fill out this short registration form to be updated about our events.</p>
+           {!keyboard ? <p>Kindly fill out this short registration form to be updated about our events.</p> : null}
           </div>
           <main className="form-signin">
            <input
@@ -201,6 +202,8 @@ function Form(props) {
             required
             id="defaultFormRegisterNameEx"
             onChange={(e) => setName(e.target.value)}
+            onFocus={() => setKeyboard(true)}
+            onBlur={() => setKeyboard(false)}
            />
            <div class="invalid-feedback">Name should not be empty</div>
            <br />
@@ -214,6 +217,8 @@ function Form(props) {
             required
             id="defaultFormRegisterNumberEx"
             onChange={(e) => setNumber(e.target.value)}
+            onFocus={() => setKeyboard(true)}
+            onBlur={() => setKeyboard(false)}
            />
            <div class="invalid-feedback">Mobile Number is not valid!</div>
           </main>
@@ -267,7 +272,7 @@ function Form(props) {
          >
           <div className="div-signin">
            {newStudent === "new" ? <p>Looks like this is your first ARJUNA webinar!</p> : <p>Looks like some of your details are missing</p>}
-           <p>By filling out the below details, you can receive updates about our events</p>
+           {!keyboard ? <p>By filling out the below details, you can receive updates about our events</p> : null}
           </div>
           <main className="form-signin">
            {newStudent === "new" || (newStudent === "part" && part.email === "") ? (
@@ -281,6 +286,8 @@ function Form(props) {
               value={email}
               required
               onChange={(e) => setEmail(e.target.value)}
+              onFocus={() => setKeyboard(true)}
+              onBlur={() => setKeyboard(false)}
              />
              <div class="invalid-feedback">Email is not valid!</div>
              <br />
@@ -337,6 +344,8 @@ function Form(props) {
               id="defaultFormRegisterdobEx"
               pattern="^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$"
               onChange={(e) => setDob(e.target.value)}
+              onFocus={() => setKeyboard(true)}
+              onBlur={() => setKeyboard(false)}
              />
              <div class="invalid-feedback">Valid format for Date of Birth: dd/mm/yyyy</div>
             </>
