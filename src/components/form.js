@@ -272,7 +272,7 @@ function Form(props) {
          >
           <div className="div-signin">
            {newStudent === "new" ? <p>Looks like this is your first ARJUNA webinar!</p> : <p>Looks like some of your details are missing</p>}
-           {deviceType === "mobile" && keyboard ? <p>By filling out the below details, you can receive updates about our events</p> : null}
+           {deviceType === "mobile" && keyboard ? null : <p>By filling out the below details, you can receive updates about our events</p>}
           </div>
           <main className="form-signin">
            {newStudent === "new" || (newStudent === "part" && part.email === "") ? (
