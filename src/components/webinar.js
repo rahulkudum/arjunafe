@@ -1970,9 +1970,6 @@ function Webinar(props) {
       <Button
        onClick={() => {
         var connectionOptions = {
-         "force new connection": true,
-         reconnectionAttempts: "Infinity",
-         timeout: 10000,
          transports: ["websocket"],
         };
 
