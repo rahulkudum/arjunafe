@@ -66,7 +66,7 @@ function Form(props) {
  const [deviceType, setDeviceType] = useState("mobile");
  const [part, setPart] = useState({ email: "", gender: "", role: "", dob: "" });
  const [menu, setMenu] = useState(false);
- const [keyboard, setKeyboard] = useState(false);
+
  const [anchorEl, setAnchorEl] = useState(null);
 
  const responsive = {
@@ -190,7 +190,7 @@ function Form(props) {
          >
           <div className="div-signin">
            <p>Thank you for your interest!</p>
-           {!keyboard ? <p>Kindly fill out this short registration form to be updated about our events.</p> : null}
+           <p>Kindly fill out this short registration form to be updated about our events.</p>
           </div>
           <main className="form-signin">
            <input
@@ -267,7 +267,7 @@ function Form(props) {
          >
           <div className="div-signin">
            {newStudent === "new" ? <p>Looks like this is your first ARJUNA webinar!</p> : <p>Looks like some of your details are missing</p>}
-           {!keyboard ? <p>By filling out the below details, you can receive updates about our events</p> : null}
+           <p>By filling out the below details, you can receive updates about our events</p>
           </div>
           <main className="form-signin">
            {newStudent === "new" || (newStudent === "part" && part.email === "") ? (
