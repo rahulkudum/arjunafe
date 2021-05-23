@@ -1969,10 +1969,17 @@ function Webinar(props) {
       </Button>
       <Button
        onClick={() => {
-        socketRef.current = io.connect("https://arjunadb.herokuapp.com", { transports: ["websocket", "polling", "flashsocket"] });
+        var connectionOptions = {
+         "force new connection": true,
+         reconnectionAttempts: "Infinity",
+         timeout: 10000,
+         transports: ["websocket"],
+        };
+
+        socketRef.current = io.connect("http://localhost:5000", connectionOptions);
 
         axios
-         .post("https://arjunadb.herokuapp.com/webinar/email", { details: mailDetails, webinarid: currentWebinar._id })
+         .post("http://localhost:5000/webinar/email", { details: mailDetails, webinarid: currentWebinar._id })
          .then((res) => {
           console.log(res);
          })

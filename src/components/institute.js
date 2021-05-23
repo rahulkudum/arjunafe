@@ -66,6 +66,20 @@ function Institute() {
 
     <main className={classes.content}>
      <div className={classes.toolbar} />
+     <button
+      onClick={() => {
+       axios
+        .post("https://arjunadb.herokuapp.com/webinar/wa", { msg: "dw", webinarid: "yguj" })
+        .then((res) => {
+         console.log(res);
+        })
+        .catch((err) => {
+         console.log(err);
+        });
+      }}
+     >
+      test
+     </button>
 
      <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">

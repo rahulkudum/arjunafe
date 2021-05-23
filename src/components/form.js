@@ -134,13 +134,6 @@ function Form(props) {
   }
  }, [done]);
 
- window.addEventListener("resize", (e) => {
-  if (keyboard) {
-   setKeyboard(false);
-  } else {
-   setKeyboard((prev) => true);
-  }
- });
  return (
   <Switch>
    <Route exact path={path}>
@@ -462,7 +455,7 @@ function Form(props) {
            setAnchorEl(null);
           }}
          >
-          <a href={`https://arjuandb.herokuapp.com/webinar/ical`}>Other Calendars (.ics)</a>
+          <a href={`https://arjunadb.herokuapp.com/webinar/ical`}>Other Calendars (.ics)</a>
          </MenuItem>
         </Dropdown>
        </div>
