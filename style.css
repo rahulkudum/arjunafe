@@ -1,0 +1,28 @@
+html,
+body {
+ align-items: center;
+ margin: 0;
+ padding: 0;
+}
+
+/* 
+   var myWidget = cloudinary.createUploadWidget(
+     {
+       cloudName: "arjunadb",
+       uploadPreset: "arjunadb",
+       sources:["local", "url", "image_search", "camera", "google_drive", "dropbox", "facebook", "instagram", "shutterstock"],
+       multiple:false,
+       cropping:true,
+       googleApiKey: "AIzaSyCEYCH1ZS1UH0C6QjWDxohAYcpRFFNyACc",
+
+       folder:"webinar_posters",
+       resourceType="image",
+     },
+     (error, result) => {
+      console.log(result);
+       console.log("err", error);
+      if (!error && result && result.event === "success") {
+       console.log("Done! Here is the image info: ", result.info);
+      }
+     }
+    ); */
