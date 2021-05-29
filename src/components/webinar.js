@@ -1579,33 +1579,33 @@ function Webinar(props) {
       </Button>
       <Button
        onClick={async () => {
-        socketRef.current = await io.connect("https://arjunadb.herokuapp.com", { transports: ["websocket", "polling", "flashsocket"] });
+        socketRef.current = await io.connect("http://localhost:4000", { transports: ["websocket", "polling", "flashsocket"] });
 
         axios
-         .post("https://arjunadb.herokuapp.com/webinar/wa", { msg: waText, webinarid: currentWebinar._id })
+         .post("http://localhost:4000", { msg: waText, webinarid: currentWebinar._id })
          .then((res) => {
           console.log(res);
          })
          .catch((err) => {
           console.log(err);
           socketRef.current.close();
-          socketRef.current = null;
          });
 
         let count = 0;
+        socketRef.current.on("qr", (res) => {
+         const parsedData = JSON.parse(res);
+         setQrCode(parsedData);
+        });
         socketRef.current.on("wa", (res) => {
          count++;
          const parsedData = JSON.parse(res);
 
-         if (count === 1) {
-          setQrCode(parsedData);
-         }
-         if (count > 1) {
+         if (count >= 1) {
           console.log(parsedData);
           setQrCode("");
 
           if (parsedData.indexOf("success") !== -1) {
-           if (count === 2) {
+           if (count === 1) {
             setWaResult((prev) => {
              let dum = { ...prev };
              dum.start = true;
@@ -1619,7 +1619,7 @@ function Webinar(props) {
            });
           }
           if (parsedData.indexOf("fail") !== -1) {
-           if (count === 2) {
+           if (count === 1) {
             setWaResult((prev) => {
              let dum = { ...prev };
              dum.start = true;
@@ -1973,10 +1973,10 @@ function Webinar(props) {
          transports: ["websocket"],
         };
 
-        socketRef.current = io.connect("http://localhost:5000", connectionOptions);
+        socketRef.current = io.connect("https://arjunadb.herokuapp.com", connectionOptions);
 
         axios
-         .post("http://localhost:5000/webinar/email", { details: mailDetails, webinarid: currentWebinar._id })
+         .post("https://arjunadb.herokuapp.com/webinar/email", { details: mailDetails, webinarid: currentWebinar._id })
          .then((res) => {
           console.log(res);
          })
